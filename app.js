@@ -82,32 +82,6 @@ app.use('/api/v1', mainApiRouter);
 // Handle favicon requests to prevent 404 errors and the strict default CSP
 app.get('/favicon.ico', (req, res) => res.status(204).send());
 
-// Home/Feed page
-app.get("/", (req, res) => res.render("feed", { title: "Feed" }));
-
-// Login page
-app.get("/login", (req, res) => res.render("login", { title: "Login" }));
-
-// Register page
-app.get("/register", (req, res) => res.render("register", { title: "Register" }));
-
-// Problems page
-app.get("/problems", (req, res) => res.render("problems", { title: "Problems" }));
-
-// Single Problem page 
-app.get("/problems/:slug", (req, res) => {
-    // In a real app, fetch problem data from your database using the slug
-    const problem = {
-        id: req.params.slug,
-        title: "Two Sum",
-        difficulty: "Easy",
-        description: "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`."
-    };
-    res.render("problem-detail", { title: problem.title, problem: problem });
-});
-
-// Contests page
-app.get("/contests", (req, res) => res.render("contests", { title: "Contests" }));
 
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
@@ -132,5 +106,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   connectDB();
-  console.log(`✅ Server running at http://localhost:${PORT}`);
+//   console.log(`✅ Server running at http://localhost:${PORT}`);
 });
