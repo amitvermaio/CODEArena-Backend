@@ -1,0 +1,39 @@
+doctype html
+html
+  head
+    title Admin - Contests | CodeArena
+    link(rel="stylesheet", href="/stylesheets/admin-contests.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Admin - Contest Management
+      nav
+        a(href="/admin") Admin Panel
+        a(href="/contests") Contests
+        a(href="/feed") Feed
+        a(href="/logout") Logout
+
+    section.admin-contests-container
+      h2 All Contests
+      if contests && contests.length
+        table.admin-contests-table
+          thead
+            tr
+              th Title
+              th Type
+              th Start
+              th End
+              th Actions
+          tbody
+            each contest in contests
+              tr
+                td= contest.title
+                td= contest.type
+                td= new Date(contest.startTime).toLocaleString()
+                td= new Date(contest.endTime).toLocaleString()
+                td
+                  a.button(href=`/admin/contests/${contest._id}/edit`) Edit
+                  form(method="POST", action=`/admin/contests/${contest._id}/delete`, style="display:inline;")
+                    button(type="submit") Delete
+      else
+        p No contests found. 

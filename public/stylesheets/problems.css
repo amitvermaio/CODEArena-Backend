@@ -1,0 +1,85 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #22223b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header nav a {
+  color: #fff;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.problems-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+}
+.problems-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.problems-table th, .problems-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+.problems-table th {
+  background: #f2e9e4;
+  color: #22223b;
+  font-weight: 600;
+}
+.problems-table tr {
+  border-bottom: 1px solid #eee;
+}
+.problems-table tr:last-child {
+  border-bottom: none;
+}
+.difficulty {
+  font-weight: 500;
+  color: #4a4e69;
+}
+.tags {
+  display: flex;
+  gap: 0.5rem;
+}
+.tag {
+  background: #c9ada7;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.95rem;
+}
+.button {
+  background: #4a4e69;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.button:hover {
+  background: #22223b;
+}
+@media (max-width: 900px) {
+  .problems-container {
+    max-width: 100vw;
+    padding: 1rem;
+  }
+  .problems-table th, .problems-table td {
+    padding: 0.5rem 0.5rem;
+  }
+} 

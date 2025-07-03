@@ -1,0 +1,65 @@
+doctype html
+html
+  head
+    title= problem.title + ' | CodeArena'
+    link(rel="stylesheet", href="/stylesheets/problem.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1= problem.title
+      nav
+        a(href="/problems") Problems
+        a(href="/feed") Feed
+        a(href="/profile") Profile
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.problem-container
+      .problem-details
+        h2= problem.title
+        p.difficulty Difficulty: #{problem.difficulty}
+        p= problem.statement
+        if problem.constraints
+          p.constraints Constraints: #{problem.constraints}
+        if problem.tags && problem.tags.length
+          p.tags
+            | Tags:
+            each tag in problem.tags
+              span.tag= tag
+        if problem.testCases && problem.testCases.length
+          h3 Sample Test Cases
+          ul.test-cases
+            each tc in problem.testCases.filter(tc => tc.isSample)
+              li
+                strong Input:
+                pre= tc.input
+                strong Output:
+                pre= tc.output
+      .ide-section
+        h3 Code Editor
+        form#code-form(method="POST", action=`/problems/${problem._id}/submit`)
+          textarea(name="code", placeholder="Write your code here...", required)
+          select(name="language", required)
+            option(value="54") C++
+            option(value="62") Java
+            option(value="71") Python
+            option(value="63") JavaScript
+          button(type="submit") Submit
+      if submissions && submissions.length
+        .submissions
+          h3 Your Submissions
+          table
+            thead
+              tr
+                th Time
+                th Status
+                th Execution Time
+                th Memory
+            tbody
+              each sub in submissions
+                tr
+                  td= new Date(sub.createdAt).toLocaleString()
+                  td= sub.status
+                  td= sub.executionTime + 's'
+                  td= sub.memoryUsed + ' KB' 

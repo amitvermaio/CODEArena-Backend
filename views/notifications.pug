@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    title Notifications | CodeArena
+    link(rel="stylesheet", href="/stylesheets/notifications.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Notifications
+      nav
+        a(href="/feed") Feed
+        a(href="/profile") Profile
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.notifications-container
+      if notifications && notifications.length
+        ul.notification-list
+          each n in notifications
+            li.notification(class=n.read ? 'read' : 'unread')
+              img.avatar(src=n.sender.profilePic alt=n.sender.username)
+              span.sender= n.sender.username
+              span.type= n.type
+              span.message= n.link ? `See more` : ''
+              if !n.read
+                form(method="POST", action=`/notifications/${n._id}/read`)
+                  button(type="submit") Mark as read
+      else
+        p No notifications. 

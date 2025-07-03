@@ -1,0 +1,94 @@
+
+html
+
+  head
+
+    title Contest | CodeArena
+
+    link(rel="stylesheet", href="/stylesheets/problems.css")
+
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+
+  body
+
+    header
+
+      h1 Problems
+
+      nav
+
+        a(href="/feed") Feed
+
+        a(href="/profile") Profile
+
+        a(href="/contests") Contests
+
+        a(href="/connections") Connections
+
+        a(href="/logout") Logout
+
+
+    section.problems-container
+
+      if problems && problems.length
+
+        table.problems-table
+
+          thead
+
+            tr
+
+              th Title
+
+              th Difficulty
+
+              th Tags
+
+              th
+
+          tbody
+
+            each problem in problems
+
+              tr
+
+                td
+
+                  a(href=`/problems/${problem._id}`)= problem.title
+
+                td.difficulty= problem.difficulty
+
+                td.tags
+
+                  each tag in problem.tags
+
+                    span.tag= tag
+
+                td
+
+                  a.button(href=`/problems/${problem._id}`) View
+
+      else
+
+        p No problems found. 
+
+  h1 Problems
+  p Here is a list of available coding challenges.
+  if problems && problems.length
+    table(style="width: 100%; border-collapse: collapse; margin-top: 1.5rem;")
+      thead
+        tr(style="border-bottom: 2px solid #ddd;")
+          th(style="padding: 12px; text-align: left; background-color: #f8f8f8;") Title
+          th(style="padding: 12px; text-align: left; background-color: #f8f8f8;") Difficulty
+          th(style="padding: 12px; text-align: left; background-color: #f8f8f8;") Tags
+      tbody
+        each problem in problems
+          tr(style="border-bottom: 1px solid #eee;")
+            td(style="padding: 12px;")
+              a(href=`/problems/${problem.slug}`)= problem.title
+            td(style="padding: 12px; color: " + problem.difficultyColor)= problem.difficulty
+            td(style="padding: 12px;")
+              each tag in problem.tags
+                span.tag(style="background-color: #eee; padding: 2px 6px; border-radius: 4px; margin-right: 5px; font-size: 0.9em;")= tag
+  else
+    p No problems found.

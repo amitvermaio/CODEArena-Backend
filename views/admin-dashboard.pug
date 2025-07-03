@@ -1,0 +1,83 @@
+doctype html
+html
+  head
+    title Admin Dashboard | CodeArena
+    link(rel="stylesheet", href="/stylesheets/admin-dashboard.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Admin Dashboard
+      nav
+        a(href="/feed") Feed
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/logout") Logout
+
+    section.admin-dashboard-container
+      h2 Users
+      if users && users.length
+        table.admin-table
+          thead
+            tr
+              th Username
+              th Email
+              th Role
+              th Actions
+          tbody
+            each user in users
+              tr
+                td= user.username
+                td= user.email
+                td= user.role
+                td
+                  form(method="POST", action=`/admin/users/${user._id}/role`)
+                    select(name="role")
+                      option(value="user" selected=user.role==='user') User
+                      option(value="admin" selected=user.role==='admin') Admin
+                    button(type="submit") Change
+                  form(method="POST", action=`/admin/users/${user._id}/delete`, style="display:inline;")
+                    button(type="submit") Delete
+      else
+        p No users found.
+      h2 Problems
+      if problems && problems.length
+        table.admin-table
+          thead
+            tr
+              th Title
+              th Difficulty
+              th Actions
+          tbody
+            each problem in problems
+              tr
+                td= problem.title
+                td= problem.difficulty
+                td
+                  a.button(href=`/admin/problems/${problem._id}/edit`) Edit
+                  form(method="POST", action=`/admin/problems/${problem._id}/delete`, style="display:inline;")
+                    button(type="submit") Delete
+      else
+        p No problems found.
+      h2 Contests
+      if contests && contests.length
+        table.admin-table
+          thead
+            tr
+              th Title
+              th Type
+              th Start
+              th End
+              th Actions
+          tbody
+            each contest in contests
+              tr
+                td= contest.title
+                td= contest.type
+                td= new Date(contest.startTime).toLocaleString()
+                td= new Date(contest.endTime).toLocaleString()
+                td
+                  a.button(href=`/admin/contests/${contest._id}/edit`) Edit
+                  form(method="POST", action=`/admin/contests/${contest._id}/delete`, style="display:inline;")
+                    button(type="submit") Delete
+      else
+        p No contests found. 

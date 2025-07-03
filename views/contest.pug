@@ -1,0 +1,62 @@
+doctype html
+html
+  head
+    title= contest.title + ' | CodeArena'
+    link(rel="stylesheet", href="/stylesheets/contest.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1= contest.title
+      nav
+        a(href="/contests") Contests
+        a(href="/feed") Feed
+        a(href="/profile") Profile
+        a(href="/problems") Problems
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.contest-container
+      .contest-info
+        h2= contest.title
+        p.type Type: #{contest.type}
+        p.time Start: #{new Date(contest.startTime).toLocaleString()} | End: #{new Date(contest.endTime).toLocaleString()}
+        p= contest.description
+        if !contest.registrants.includes(currentUser._id)
+          form(method="POST", action=`/contests/${contest._id}/register`)
+            button(type="submit") Register
+        else
+          span.registered Registered
+      if contest.problems && contest.problems.length
+        .contest-problems
+          h3 Problems
+          ul
+            each problem in contest.problems
+              li
+                a(href=`/problems/${problem._id}`)= problem.title
+      if leaderboard && leaderboard.length
+        .contest-leaderboard
+          h3 Leaderboard
+          table
+            thead
+              tr
+                th Rank
+                th User
+                th Score
+                th Penalty
+            tbody
+              each entry, idx in leaderboard
+                tr
+                  td= idx + 1
+                  tdextends layout.pug
+                  
+                  block content
+                    h1 Contests
+                    p A list of all upcoming, ongoing, and past contests will be displayed here.
+                  extends layout.pug
+                  
+                  block content
+                    h1 Contests
+                    p A list of all upcoming, ongoing, and past contests will be displayed here.
+                  = entry.user.username
+                  td= entry.score
+                  td= entry.penalty 

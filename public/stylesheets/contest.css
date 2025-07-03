@@ -1,0 +1,87 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #22223b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header nav a {
+  color: #fff;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.contest-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+}
+.contest-info h2 {
+  margin: 0 0 0.5rem 0;
+  color: #22223b;
+}
+.type {
+  background: #c9ada7;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.95rem;
+  margin-left: 1rem;
+}
+.time {
+  color: #888;
+  font-size: 0.98rem;
+}
+.registered {
+  color: #4a4e69;
+  font-weight: 600;
+  margin-left: 1rem;
+}
+.contest-problems {
+  margin-top: 2rem;
+}
+.contest-problems ul {
+  list-style: none;
+  padding: 0;
+}
+.contest-problems li {
+  margin-bottom: 0.7rem;
+}
+.contest-leaderboard {
+  margin-top: 2rem;
+}
+.contest-leaderboard table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.contest-leaderboard th, .contest-leaderboard td {
+  padding: 0.6rem 1rem;
+  text-align: left;
+}
+.contest-leaderboard th {
+  background: #f2e9e4;
+  color: #22223b;
+  font-weight: 600;
+}
+.contest-leaderboard tr {
+  border-bottom: 1px solid #eee;
+}
+.contest-leaderboard tr:last-child {
+  border-bottom: none;
+}
+@media (max-width: 900px) {
+  .contest-container {
+    max-width: 100vw;
+    padding: 1rem;
+  }
+} 

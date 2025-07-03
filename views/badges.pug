@@ -1,0 +1,28 @@
+doctype html
+html
+  head
+    title Badges | CodeArena
+    link(rel="stylesheet", href="/stylesheets/badges.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Badges
+      nav
+        a(href="/feed") Feed
+        a(href="/profile") Profile
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.badges-container
+      if badges && badges.length
+        ul.badge-list
+          each badge in badges
+            li.badge
+              img.icon(src=badge.iconUrl alt=badge.name)
+              .badge-info
+                span.name= badge.name
+                span.desc= badge.description
+      else
+        p No badges found. 

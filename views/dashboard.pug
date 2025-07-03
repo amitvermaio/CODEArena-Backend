@@ -1,0 +1,59 @@
+doctype html
+html
+  head
+    title Dashboard | CodeArena
+    link(rel="stylesheet", href="/stylesheets/dashboard.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Dashboard
+      nav
+        a(href="/feed") Feed
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.dashboard-container
+      .dashboard-header
+        img.avatar(src=user.profilePic alt=user.username)
+        form#avatar-upload(method="POST", action="/users/profile/avatar", enctype="multipart/form-data")
+          input(type="file", name="avatar", accept="image/*")
+          button(type="submit") Change Avatar
+        .user-info
+          h2= user.fullName || user.username
+          p.username @#{user.username}
+          p.email= user.email
+      .dashboard-main
+        form#profile-edit(method="POST", action="/users/profile")
+          label(for="fullName") Full Name
+          input(type="text", name="fullName", value=user.fullName)
+          label(for="bio") Bio
+          textarea(name="bio")= user.bio
+          label(for="skills") Skills (comma separated)
+          input(type="text", name="skills", value=(user.skills || []).join(", "))
+          label(for="github") GitHub
+          input(type="text", name="github", value=user.socialLinks.github)
+          label(for="linkedin") LinkedIn
+          input(type="text", name="linkedin", value=user.socialLinks.linkedin)
+          label(for="twitter") Twitter
+          input(type="text", name="twitter", value=user.socialLinks.twitter)
+          label(for="facebook") Facebook
+          input(type="text", name="facebook", value=user.socialLinks.facebook)
+          button(type="submit") Save Changes
+        .dashboard-stats
+          h3 Stats
+          ul
+            li Problems Solved: #{stats.problemsSolved}
+            li Contests Participated: #{stats.contests}
+            li Connections: #{stats.connections}
+        .dashboard-badges
+          h3 Badges
+          if badges && badges.length
+            ul.badge-list
+              each badge in badges
+                li.badge
+                  img.icon(src=badge.iconUrl alt=badge.name)
+                  span.name= badge.name
+          else
+            p No badges yet. 

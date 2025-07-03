@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    title Collaborative Session | CodeArena
+    link(rel="stylesheet", href="/stylesheets/collab-session.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Collaborative Coding Session
+      nav
+        a(href="/feed") Feed
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.collab-session-container
+      .collab-left
+        .video-call
+          h2 Video Call
+          //- Video elements for local/remote streams
+          video#localVideo(autoplay, muted, playsinline)
+          video#remoteVideo(autoplay, playsinline)
+        .collab-chat
+          h3 Session Chat
+          .chat-log#chatLog(style="height:55vh;overflow-y:auto;")
+            //- Chat messages will appear here
+          form#chatForm
+            input(type="text", name="message", placeholder="Type a message...", required)
+            button(type="submit") Send
+      .collab-right
+        .collab-editor
+          h2= problem.title
+          //- Collaborative code editor placeholder
+          #editor(style="height:70vh;width:100%;border:1px solid #ccc;")
+          form#runForm(method="POST", action=`/collab/${session._id}/run`)
+            button(type="submit") Run Code 

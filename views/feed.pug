@@ -1,0 +1,90 @@
+html
+
+  head
+
+    title CodeArena - Feed
+
+    link(rel="stylesheet", href="/stylesheets/feed.css")
+
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+
+  body
+
+    header
+
+      h1 CodeArena Feed
+
+      nav
+
+        a(href="/profile") Profile
+
+        a(href="/problems") Problems
+
+        a(href="/contests") Contests
+
+        a(href="/connections") Connections
+
+        a(href="/logout") Logout
+
+
+    section.feed-container
+
+      //- Post creation form
+
+      form#create-post(method="POST", action="/posts", enctype="multipart/form-data")
+
+        textarea(name="caption", placeholder="What's on your mind?" required)
+
+        input(type="file", name="image")
+
+        button(type="submit") Post
+
+
+      //- Feed posts
+
+      each post in posts
+
+        article.post
+
+          .post-header
+
+            img.avatar(src=post.user.profilePic alt=post.user.username)
+
+            span.username= post.user.username
+
+            span.time= post.createdAt.toLocaleString()
+
+          if post.imageUrl
+
+            img.post-image(src=post.imageUrl alt="Post image")
+
+          p.caption= post.caption
+
+          .post-actions
+
+            //- Actions here
+
+
+    script.
+
+      // Script here
+
+  h1 CodeArena Feed
+  p Welcome! Here are some recent posts from the community.
+  if posts && posts.length
+    each post in posts
+      article(style="border: 1px solid #ddd; padding: 1rem; margin-bottom: 1rem; border-radius: 8px;")
+        .post-header(style="display: flex; align-items: center; margin-bottom: 0.5rem;")
+          img.avatar(src="https://i.pravatar.cc/40?u=" + post.user.username, alt=post.user.username, style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;")
+          div
+            span.username(style="font-weight: bold;")= post.user.username
+            br
+            span.time(style="font-size: 0.8em; color: #777;")= post.createdAt
+        p.caption= post.caption
+        if post?.imageUrl
+          img.post-image(src=post.imageUrl, alt="Post image", style="max-width: 100%; border-radius: 8px; margin-top: 10px;")
+        .post-actions(style="margin-top: 10px;")
+          span(style="margin-right: 15px;") ❤️ #{post.likes} Likes
+          span 💬 #{post.comments} Comments
+  else
+    p No posts to show right now.

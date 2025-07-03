@@ -1,0 +1,88 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #22223b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header nav a {
+  color: #fff;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.contests-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+}
+h2 {
+  color: #22223b;
+  margin-top: 2rem;
+}
+.contest-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+.contest {
+  background: #f2e9e4;
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  justify-content: space-between;
+}
+.contest h3 {
+  margin: 0;
+  color: #4a4e69;
+}
+.type {
+  background: #c9ada7;
+  color: #fff;
+  border-radius: 4px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.95rem;
+  margin-left: 1rem;
+}
+.time {
+  color: #888;
+  font-size: 0.98rem;
+}
+.button {
+  background: #4a4e69;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+.button:hover {
+  background: #22223b;
+}
+@media (max-width: 900px) {
+  .contests-container {
+    max-width: 100vw;
+    padding: 1rem;
+  }
+  .contest {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+} 

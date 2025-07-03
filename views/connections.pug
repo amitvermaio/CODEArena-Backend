@@ -1,0 +1,47 @@
+doctype html
+html
+  head
+    title Connections | CodeArena
+    link(rel="stylesheet", href="/stylesheets/connections.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1 Connections
+      nav
+        a(href="/feed") Feed
+        a(href="/profile") Profile
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/logout") Logout
+
+    section.connections-container
+      h2 Your Connections
+      if connections && connections.length
+        ul.connection-list
+          each user in connections
+            li.connection
+              img.avatar(src=user.profilePic alt=user.username)
+              span.username= user.username
+              span.fullname= user.fullName
+              form(method="POST", action=`/users/connections/${user._id}?_method=DELETE`)
+                button(type="submit") Remove
+      else
+        p No connections yet.
+      h2 Find Users
+      form#search-form(method="GET", action="/connections")
+        input(type="text", name="q", placeholder="Search by username or name", required)
+        button(type="submit") Search
+      if searchResults && searchResults.length
+        ul.search-results
+          each user in searchResults
+            li.search-user
+              img.avatar(src=user.profilePic alt=user.username)
+              span.username= user.username
+              span.fullname= user.fullName
+              if !connections.map(c => c._id.toString()).includes(user._id.toString())
+                form(method="POST", action=`/users/connections/request/${user._id}`)
+                  button(type="submit") Connect
+              else
+                span.connected Connected
+      else if searchResults
+        p No users found. 

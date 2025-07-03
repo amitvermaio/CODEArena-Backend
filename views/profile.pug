@@ -1,0 +1,66 @@
+extends layout.pug
+
+block content
+  if user
+    h1 Profile: #{user.username}
+    p #[strong Full Name:] #{user.fullName}
+    p #[strong Problems Solved:] #{user.problemsSolved}
+  else
+    h1 User Profile
+    p User not found or data not available.
+doctype html
+html
+  head
+    title= user.username + ' - Profile | CodeArena'
+    link(rel="stylesheet", href="/stylesheets/profile.css")
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+  body
+    header
+      h1= user.username + "'s Profile"
+      nav
+        a(href="/feed") Feed
+        a(href="/problems") Problems
+        a(href="/contests") Contests
+        a(href="/connections") Connections
+        a(href="/logout") Logout
+
+    section.profile-container
+      .profile-header
+        img.avatar(src=user.profilePic alt=user.username)
+        .profile-info
+          h2= user.fullName || user.username
+          p.bio= user.bio
+          if user._id != currentUser._id
+            if user.connections && user.connections.includes(currentUser._id)
+              form(method="POST", action=`/users/${user.username}/unfollow`)
+                button(type="submit") Unfollow
+            else
+              form(method="POST", action=`/users/${user.username}/follow`)
+                button(type="submit") Follow
+          //- Badges
+          if badges && badges.length
+            .badges
+              h3 Badges
+              ul
+                each badge in badges
+                  li.badge
+                    img(src=badge.iconUrl alt=badge.name)
+                    span= badge.name
+      //- User's posts
+      .user-posts
+        h3 #{user.username}'s Posts
+        if posts && posts.length
+          each post in posts
+            article.post
+              .post-header
+                img.avatar(src=post.user.profilePic alt=post.user.username)
+                span.username= post.user.username
+                span.time= post.createdAt.toLocaleString()
+              if post.imageUrl
+                img.post-image(src=post.imageUrl alt="Post image")
+              p.caption= post.caption
+              .post-actions
+                span.likes #{post.likes.length} likes
+                span.comments #{post.comments.length} comments
+        else
+          p No posts yet. 

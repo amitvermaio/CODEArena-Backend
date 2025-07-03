@@ -1,0 +1,149 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #22223b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header nav a {
+  color: #fff;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.collab-session-container {
+  display: flex;
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+  min-height: 80vh;
+}
+.collab-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.video-call {
+  background: #f2e9e4;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.video-call h2 {
+  margin: 0 0 0.5rem 0;
+  color: #22223b;
+}
+#localVideo, #remoteVideo {
+  width: 120px;
+  height: 90px;
+  background: #22223b;
+  border-radius: 8px;
+  margin: 0.3rem;
+  object-fit: cover;
+  border: 2px solid #c9ada7;
+}
+.collab-chat {
+  background: #f6f8fa;
+  border-radius: 8px;
+  padding: 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.collab-chat h3 {
+  margin: 0 0 0.5rem 0;
+  color: #22223b;
+}
+.chat-log {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.7rem;
+  overflow-y: auto;
+}
+#chatForm {
+  display: flex;
+  gap: 0.5rem;
+}
+#chatForm input[type="text"] {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+#chatForm button {
+  background: #4a4e69;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#chatForm button:hover {
+  background: #22223b;
+}
+.collab-right {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.collab-editor {
+  background: #f2e9e4;
+  border-radius: 8px;
+  padding: 1rem;
+  height: 100%;
+}
+.collab-editor h2 {
+  margin: 0 0 0.5rem 0;
+  color: #22223b;
+}
+#editor {
+  background: #fff;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  min-height: 300px;
+  font-family: 'Fira Mono', 'Consolas', monospace;
+  font-size: 1.1rem;
+}
+#runForm button {
+  background: #4a4e69;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+#runForm button:hover {
+  background: #22223b;
+}
+@media (max-width: 1100px) {
+  .collab-session-container {
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+  .collab-left, .collab-right {
+    width: 100%;
+  }
+} 

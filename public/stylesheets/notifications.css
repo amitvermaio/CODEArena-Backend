@@ -1,0 +1,98 @@
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f6f8fa;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background: #22223b;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+header nav a {
+  color: #fff;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.notifications-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 2rem;
+}
+.notification-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.notification {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  background: #f2e9e4;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  transition: background 0.2s;
+}
+.notification.unread {
+  background: #ffe066;
+}
+.notification.read {
+  opacity: 0.7;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #c9ada7;
+}
+.sender {
+  font-weight: 600;
+  color: #22223b;
+}
+.type {
+  color: #4a4e69;
+  font-size: 0.98rem;
+}
+.message {
+  color: #555;
+  font-size: 0.98rem;
+  margin-left: 1rem;
+}
+form button {
+  background: #4a4e69;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-left: 1rem;
+}
+form button:hover {
+  background: #22223b;
+}
+@media (max-width: 800px) {
+  .notifications-container {
+    max-width: 100vw;
+    padding: 1rem;
+  }
+  .notification {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .avatar {
+    width: 32px;
+    height: 32px;
+  }
+} 
