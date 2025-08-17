@@ -110,3 +110,41 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
     
     return res.status(200).json(new ApiResponse(200, { user: userResponse }, "Access token refreshed"));
 });
+
+
+// Send Password Reset OTP
+export const passwordResetOtp = async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return 
+  }
+
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user) {
+      return res.status(404).json({success: false, error: "User not found" });
+    }
+    
+    const otp = generateOTP();
+
+    user.resetOtp = otp;
+    user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000;
+    
+    await user.save();
+
+    const mailOptions = {
+      from: process.env.EMAIL_ADDRESS,
+      to: user.email,
+      subject: "Password Reset OTP",
+      text: `Welcome to CodeArena! ${user.email}\n Please Verify your account to reset your password your OTP is ${otp}`,
+      html: generatePasswordResetOTPEmail(user.email, otp)
+    }
+
+    await transporter.sendMail(mailOptions);
+
+    res.status(200).json({ success: true, message: "OTP sent successfully" });
+  } catch (error) {
+    res.status(500).json({success: false, error: error.message });
+  }
+}

@@ -16,7 +16,7 @@ import {
 const router = express.Router();
 
 // --- Local Authentication ---
-// @route   POST api/auth/register
+// @route   POST api/v1/auth/register
 router.post('/register', registerValidation, handleValidationErrors, registerUser);
 
 // Custom login with email/username and password
@@ -27,6 +27,19 @@ router.post('/login/passport',
     passport.authenticate('local', { failureRedirect: '/api/auth/login-failure' }),
     loginSuccess
 );
+
+// @route   POST api/v1/auth/verify-otp
+// router.post('/verify-otp', sendVerifyOtp);
+
+// @route   POST api/v1/auth/verify-account
+// router.post('/verify-account', verifyAccount);
+
+// @route   POST api/v1/auth/password-reset-otp
+router.post('/password-reset-otp', null);
+
+
+// @route   POST api/v1/auth/password-reset-otp
+router.post('/reset-password', resetPassword);
 
 // @route   GET api/auth/login-failure (helper route)
 router.get('/login-failure', loginFailure);
@@ -50,16 +63,6 @@ router.get('/github/callback',
     passport.authenticate('github', { failureRedirect: '/' }),
     oauthCallback
 );
-
-// --- GitHub OAuth ---
-// @route   GET api/auth/linkedin
-router.get('/linkedin', passport.authenticate('linkedin'));
-
-// @route   GET api/auth/github/callback
-router.get('/linkedin/callback',
-    passport.authenticate('linkedin', { failureRedirect: '/login' }),
-    oauthCallback
-)
 
 // --- Session Management ---
 // @route   GET api/auth/me (Check login status and get user data)

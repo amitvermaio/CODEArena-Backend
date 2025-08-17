@@ -25,7 +25,6 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false, 
         minlength: 6,
-        select: false, 
     },
     fullname: { 
         type: String,
@@ -37,22 +36,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         default: "https://icon-library.com/images/default-user-icon/default-user-icon-6.jpg",
     },
-    dob: {
-        type: Date,
-        default: null,
-    },
-    connections: [
-        { type: Schema.Types.ObjectId, ref: 'User' }
-    ], // Server-managed: Only modified by connection logic
     problemSolved: [
         { type: Schema.Types.ObjectId, ref: 'Problem' }
     ], // Server-managed: Only modified upon successful problem submission
-    contestWon: [
-        { type: Schema.Types.ObjectId, ref: 'Contest' }
-    ], // Server-managed: Only modified when a contest is won
-    badges: [
-        { type: Schema.Types.ObjectId, ref: 'Badge' }
-    ], // Server-managed: Only awarded by the server based on achievements
     location: {
         type: String,
         default: 'Earth', 
@@ -75,10 +61,6 @@ const UserSchema = new mongoose.Schema({
             type: String,
             default: ''
         },
-        facebook: {
-            type: String,
-            default: ''
-        }
     },
     skills: [{
         type: String,
@@ -97,10 +79,6 @@ const UserSchema = new mongoose.Schema({
     githubId: {
         type: String,
         immutable: true,
-    },
-    linkedinId: {
-        type: String,
-        immutable: true, 
     },
     role: {
         type: String,
@@ -150,8 +128,6 @@ UserSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
-            email: this.email,
-            username: this.username,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {

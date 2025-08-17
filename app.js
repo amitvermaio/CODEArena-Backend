@@ -22,24 +22,21 @@ const __dirname = import.meta.dirname;
 const PORT = process.env.PORT || 8080;
  
 // Cors Middleware
-const allowedOrigins = [
-    'http://localhost:3000',
-];
- 
+const allowedOrigins = ['http://localhost:5173'];
+
 app.use(
-    cors({
-        origin: (origin, callback) => {
-            // `origin` aapke frontend ka URL hai.
-            // Agar request Postman ya mobile app se aati hai to `origin` undefined hota hai.
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('This origin is not allowed by CORS'));
-            }
-        },
-        credentials: true,
-    })
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // 👈 allow cookies
+  })
 );
+
 
 // Body Parsing Middleware
 app.use(express.json({ limit: '16kb' }));
