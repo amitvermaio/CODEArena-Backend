@@ -19,20 +19,35 @@ initializePassport(passport);
 
 const app = express();
 const __dirname = import.meta.dirname; 
-const PORT = process.env.PORT || 3000;
-
+const PORT = process.env.PORT || 8080;
+ 
 // Cors Middleware
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true
-}));
+const allowedOrigins = [
+    'http://localhost:3000',
+];
+ 
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // `origin` aapke frontend ka URL hai.
+            // Agar request Postman ya mobile app se aati hai to `origin` undefined hota hai.
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('This origin is not allowed by CORS'));
+            }
+        },
+        credentials: true,
+    })
+);
+
+// Body Parsing Middleware
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static(join(__dirname, 'public')));
 app.use(cookieParser());
 
 // --- Session Middleware ---
-// Must come BEFORE passport middleware
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -45,8 +60,8 @@ app.use(session({
     cookie: {
         maxAge: THIRTY_DAYS,
         secure: process.env.NODE_ENV === 'production',
-        httpOnly: true, // Add httpOnly attribute for security
-        sameSite: 'strict', // Add sameSite attribute for security
+        httpOnly: true,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Allow cross-site cookies in production
     }
 }));
 
@@ -69,15 +84,8 @@ app.use((req, res, next) => {
     next();
 });
 
-// View engine setup
-app.set('view engine', 'pug');
-app.set('views', join(__dirname, 'views'));
-
 // API Routes
 app.use('/api/v1', mainApiRouter);
-
-// --- Page Rendering Routes ---
-// These routes render the .pug files for the user to see in the browser.
 
 // Handle favicon requests to prevent 404 errors and the strict default CSP
 app.get('/favicon.ico', (req, res) => res.status(204).send());
@@ -106,5 +114,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   connectDB();
-//   console.log(`✅ Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });

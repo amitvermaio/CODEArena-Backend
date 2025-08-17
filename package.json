@@ -8,7 +8,7 @@
     "dev": "node app.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Amit Verma",
   "license": "ISC",
   "description": "",
   "dependencies": {

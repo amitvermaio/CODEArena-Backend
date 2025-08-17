@@ -12,7 +12,6 @@ export const loginValidation = [
       throw new Error('Either email or username is required');
     }
     if (req.body.email && req.body.email.trim() !== '') {
-      // Validate email format
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email)) {
         throw new Error('Please include a valid email');
       }

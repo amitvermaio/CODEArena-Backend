@@ -17,7 +17,7 @@ const router = express.Router();
 
 // --- User Routes ---
 // GET api/v1/problems -> Get all problems (with filters)
-router.get('/', getAllProblems);
+router.get('/', protect, getAllProblems);
 
 // GET api/v1/problems/:problemId -> Get a single problem
 router.get('/:problemId', getProblemById);
