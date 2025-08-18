@@ -1,11 +1,11 @@
-class ApiError extends Error {
+class ApiError extends Error { // extend error class for overriding some of its methods.
     constructor(
         statusCode,
         message = "Something went wrong",
         errors = [],
         stack = ""
     ) {
-        super(message)
+        super(message) // overriding message 
         this.statusCode = statusCode
         this.data = null
         this.message = message

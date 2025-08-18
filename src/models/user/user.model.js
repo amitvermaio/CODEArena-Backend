@@ -1,6 +1,7 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose from 'mongoose';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -32,8 +33,8 @@ const UserSchema = new mongoose.Schema({
         minlength: 3,
         maxlength: 50,
     },
-    profilePic: {
-        type: String,
+    avatar: {
+        type: String, // cloundinary url
         default: "https://icon-library.com/images/default-user-icon/default-user-icon-6.jpg",
     },
     problemSolved: [
@@ -109,7 +110,7 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Pre-save hook to hash password if it's provided/modified
-UserSchema.pre('save', async function(next) {
+UserSchema.pre('save', async function(next) { // we're not using arrow fn here coz it doesn't have access to refrence "this"!!
     if (!this.isModified('password') || !this.password) {
         return next();
     }
@@ -128,6 +129,7 @@ UserSchema.methods.generateAccessToken = function () {
     return jwt.sign(
         {
             _id: this._id,
+            username: this.username,
         },
         process.env.ACCESS_TOKEN_SECRET,
         {
