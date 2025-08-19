@@ -6,25 +6,25 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import Badge from '../models/user/badge.model.js';
 import Notification from '../models/platform/notification.model.js';
 
-const generateAccessAndRefreshTokens = async (userId) => {
-    try {
-        const user = await User.findById(userId);
-        const accessToken = user.generateAccessToken();
-        const refreshToken = user.generateRefreshToken();
+// const generateAccessAndRefreshTokens = async (userId) => {
+//     try {
+//         const user = await User.findById(userId);
+//         const accessToken = user.generateAccessToken();
+//         const refreshToken = user.generateRefreshToken();
 
-        user.refreshToken = refreshToken;
-        await user.save({ validateBeforeSave: false });
+//         user.refreshToken = refreshToken;
+//         await user.save({ validateBeforeSave: false });
 
-        return { accessToken, refreshToken };
-    } catch (error) {
-        throw new ApiError(500, "Something went wrong while generating refresh and access tokens");
-    }
-};
+//         return { accessToken, refreshToken };
+//     } catch (error) {
+//         throw new ApiError(500, "Something went wrong while generating refresh and access tokens");
+//     }
+// };
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullName, email, username, password } = req.body;
+    const { email, username, password } = req.body;
 
-    if ([fullName, email, username, password].some((field) => field?.trim() === "")) {
+    if ([email, username, password].some((field) => field?.trim() === "")) {
         throw new ApiError(400, "All fields are required");
     }
 
@@ -35,7 +35,6 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.create({
-        fullName,
         email,
         password,
         username: username.toLowerCase()

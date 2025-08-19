@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
 
-const UserSchema = new mongoose.Schema({
+const UserSchema = new Schema({
     username: {
         type: String,
         required: true,
@@ -38,7 +38,7 @@ const UserSchema = new mongoose.Schema({
         default: "https://icon-library.com/images/default-user-icon/default-user-icon-6.jpg",
     },
     problemSolved: [
-        { type: Schema.Types.ObjectId, ref: 'Problem' }
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }
     ], // Server-managed: Only modified upon successful problem submission
     location: {
         type: String,

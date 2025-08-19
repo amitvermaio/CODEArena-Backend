@@ -35,11 +35,11 @@ router.post('/login/passport',
 // router.post('/verify-account', verifyAccount);
 
 // @route   POST api/v1/auth/password-reset-otp
-router.post('/password-reset-otp', null);
+// router.post('/password-reset-otp', null);
 
 
 // @route   POST api/v1/auth/password-reset-otp
-router.post('/reset-password', resetPassword);
+// router.post('/reset-password', resetPassword);
 
 // @route   GET api/auth/login-failure (helper route)
 router.get('/login-failure', loginFailure);
