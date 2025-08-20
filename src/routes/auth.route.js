@@ -10,17 +10,24 @@ import {
     loginFailure,
     oauthCallback,
     getMe,
-    logoutUser
+    logoutUser,
+    refreshAccessToken
 } from '../controllers/auth.controller.js';
 
 const router = express.Router();
 
 // --- Local Authentication ---
 // @route   POST api/v1/auth/register
-router.post('/register', registerValidation, handleValidationErrors, registerUser);
+router.post('/register', registerValidation, handleValidationErrors,  registerUser);
 
 // Custom login with email/username and password
 router.post('/login', loginValidation, handleValidationErrors, loginUser);
+
+// Logout 
+router.post('/logout', protect, logoutUser);
+
+// Refresh Token POST api/v1/auth/refresh-token
+router.post('/refresh-token', refreshAccessToken);
 
 // Passport login (optional)
 router.post('/login/passport',

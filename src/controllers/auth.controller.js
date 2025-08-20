@@ -5,6 +5,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import jwt from 'jsonwebtoken';
 
 import '../config/passport.config.js';
+import { ApiError } from '../utils/ApiError.js';
 
 
 // Cookie options for security
@@ -47,14 +48,17 @@ export const loginSuccess = (req, res) => {
 
 // Controller for local login
 export const loginUser = asyncHandler(async (req, res) => {
-    const { email, username, password } = req.body;
-    const { user, accessToken, refreshToken } = await loginUserService({ email, username, password });
-    
-    // Set cookies
-    res.cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
-       .cookie(process.env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, { ...cookieOptions, maxAge: 30 * 24 * 60 * 60 * 1000 });
-
-    return res.status(200).json(new ApiResponse(200, user, "User logged in successfully"));
+    try {
+        const { email, username, password } = req.body;
+        const { user, accessToken, refreshToken } = await loginUserService({ email, username, password });
+        
+        res.cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
+        .cookie(process.env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, { ...cookieOptions, maxAge: 30 * 24 * 60 * 60 * 1000 });
+        
+        return res.status(200).json(new ApiResponse(200, user, "User logged in successfully"));
+    } catch (error) {
+        throw new ApiError(404, "Email or username required!", error.message);
+    }
 });
 
 // Controller for login failure (actual auth is in middleware)
@@ -77,10 +81,9 @@ export const getMe = asyncHandler(async (req, res) => {
 
 // Controller for logging out
 export const logoutUser = asyncHandler(async (req, res) => {
-    // Invalidate the refresh token in the database
     await User.findByIdAndUpdate(
         req.user._id,
-        { $unset: { refreshToken: 1 } }, // removes the field
+        { $set: { refreshToken: undefined } }, // removes the field
         { new: true }
     );
 

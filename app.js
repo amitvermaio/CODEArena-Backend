@@ -1,21 +1,19 @@
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import session from 'express-session';
+import 'dotenv/config';
 import cookieParser from 'cookie-parser';
 import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import { join } from "path";
 
 import connectDB from './src/config/db.js';
-import { initializePassport } from './src/config/passport.config.js';
+// import { initializePassport } from './src/config/passport.config.js';
 
 import mainApiRouter from './src/routes/routes.js';
 import { ApiResponse } from './src/utils/ApiResponse.js';
 import { ApiError } from './src/utils/ApiError.js';
 
-dotenv.config();
-initializePassport(passport); 
+
 
 const app = express();
 const __dirname = import.meta.dirname; 
@@ -33,7 +31,7 @@ app.use(
         callback(new Error('Not allowed by CORS'));
       }
     },
-    credentials: true, // 👈 allow cookies
+    credentials: true, 
   })
 );
 
@@ -42,29 +40,7 @@ app.use(
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: true, limit: '16kb' }));
 app.use(express.static(join(__dirname, 'public')));
-app.use(cookieParser());
-
-// --- Session Middleware ---
-const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false, // Don't save session if unmodified
-    saveUninitialized: true, // Changed to true to help with unauthenticated sessions
-    store: MongoStore.create({ 
-        mongoUrl: process.env.MONGO_URI,
-        collectionName: 'sessions' 
-    }),
-    cookie: {
-        maxAge: THIRTY_DAYS,
-        secure: process.env.NODE_ENV === 'production',
-        httpOnly: true,
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Allow cross-site cookies in production
-    }
-}));
-
-// --- Passport Middleware ---
-app.use(passport.initialize());
-app.use(passport.session()); 
+app.use(cookieParser()); 
 
 // --- Content Security Policy (CSP) Middleware ---
 // This sets a security policy to prevent common attacks.

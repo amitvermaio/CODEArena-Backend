@@ -1,24 +1,27 @@
 import { body } from 'express-validator';
 
 export const registerValidation = [
-    body('email', 'Please include a valid email').isEmail().normalizeEmail(),
+    body('email').trim().isEmail().withMessage('Please include a valid email').normalizeEmail(),
     body('username', 'Username is required and must be alphanumeric').isAlphanumeric().trim().escape(),
     body('password', 'Please enter a password with 6 or more characters').isLength({ min: 6 })
 ];
 
 export const loginValidation = [
+  // Custom validator to ensure that either email or username is present.
   body().custom((value, { req }) => {
-    if ((!req.body.email || req.body.email.trim() === '') && (!req.body.username || req.body.username.trim() === '')) {
+    const { email, username } = req.body;
+    if ((!email || email.trim() === '') && (!username || username.trim() === '')) {
       throw new Error('Either email or username is required');
-    }
-    if (req.body.email && req.body.email.trim() !== '') {
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(req.body.email)) {
-        throw new Error('Please include a valid email');
-      }
-    }
-    if (!req.body.password || req.body.password.trim() === '') {
-      throw new Error('Password is required');
     }
     return true;
   }),
+
+  // If email is provided, it must be a valid email. This is more robust than a custom regex.
+  body('email')
+    .optional({ checkFalsy: true }) // Skips validation if field is falsy (e.g., '', null)
+    .isEmail().withMessage('Please include a valid email')
+    .normalizeEmail(),
+
+  // Password is always required.
+  body('password', 'Password is required').notEmpty(),
 ];

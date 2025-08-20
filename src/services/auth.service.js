@@ -1,7 +1,7 @@
 import { User } from '../models/user/user.model.js'; 
-import bcrypt from 'bcrypt';
-import { generateToken } from '../utils/jwt.js'; 
 import { ApiError } from '../utils/ApiError.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+
 
 export const registerUserService = async (userData) => {
     const { username, email, password } = userData;
@@ -25,7 +25,14 @@ export const registerUserService = async (userData) => {
 };
 
 export const loginUserService = async ({ email, username, password }) => {
-    const user = await User.findOne(email ? { email } : { username }).select('+password');
+    if (!email && !username) {
+        throw new ApiError(400, "Username or email is required");
+    }
+
+    const user = await User.findOne({
+        $or: [{ email }, { username }]
+    }).select('+password');    
+
     if (!user) {
         throw new ApiError(404, "User not found");
     }
@@ -34,17 +41,15 @@ export const loginUserService = async ({ email, username, password }) => {
     if (!isPasswordValid) {
         throw new ApiError(401, "Invalid user credentials");
     }
-
+    
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
-
-    // Store refresh token in the database
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
 
     const userResponse = user.toObject();
     delete userResponse.password;
     delete userResponse.refreshToken;
-
+    
     return { user: userResponse, accessToken, refreshToken };
 };

@@ -22,7 +22,7 @@ export const protect = asyncHandler(async (req, _, next) => {
             throw new ApiError(401, "Invalid Access Token: User not found");
         }
 
-        // Optional: Check if the user is banned or deactivated
+        // !  Optional: Check if the user is banned or deactivated
         if (user.isBanned) {
             throw new ApiError(403, "Access Denied: This account has been banned.");
         }
