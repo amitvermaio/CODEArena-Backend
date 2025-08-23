@@ -1,10 +1,10 @@
-import Problem from '../models/problem/problem.model.js';
-import Submission from '../models/problem/submission.model.js';
-import { User } from '../models/user/user.model.js';
+import { Problem } from '../models/problem/problem.model.js';
+import { Submission } from '../models/problem/submission.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
-import axios from 'axios';
+import { submitSolutionService } from "../services/solution.service.js";
+
 
 const JUDGE0_URL = 'https://judge0-ce.p.rapidapi.com/submissions';
 const JUDGE0_HEADERS = {
@@ -23,7 +23,7 @@ export const getAllProblems = asyncHandler(async (req, res) => {
 });
 
 export const getProblemById = asyncHandler(async (req, res) => {
-  const problem = await Problem.findById(req.params.problemId);
+  const problem = await Problem.findOne({ slug: req.params.problemId });
   if (!problem) {
     throw new ApiError(404, 'Problem not found');
   }
@@ -60,47 +60,19 @@ export const getProblemById = asyncHandler(async (req, res) => {
 export const submitSolution = asyncHandler(async (req, res) => {
   const { code, language } = req.body;
   const { problemId } = req.params;
-  if (!code || !language) throw new ApiError(400, 'Code and language are required');
-  const problem = await Problem.findById(problemId);
-  if (!problem) throw new ApiError(404, 'Problem not found');
-  // Run code for each test case
-  let allPassed = true;
-  let results = [];
-  for (const testCase of problem.testCases) {
-    const submissionRes = await axios.post(JUDGE0_URL + '?base64_encoded=false&wait=true', {
-      source_code: code,
-      language_id: language,
-      stdin: testCase.input,
-      expected_output: testCase.output
-    }, { headers: JUDGE0_HEADERS });
-    const result = submissionRes.data;
-    results.push({
-      input: testCase.input,
-      output: testCase.output,
-      stdout: result.stdout,
-      stderr: result.stderr,
-      status: result.status,
-      time: result.time,
-      memory: result.memory
-    });
-    if (result.status.id !== 3) allPassed = false; // 3 = Accepted
-  }
-  // Save submission
-  const submission = await Submission.create({
-    user: req.user._id,
-    problem: problem._id,
+
+  const { submission, results, allPassed } = await submitSolutionService(
+    req.user,
+    problemId,
     code,
-    language,
-    status: allPassed ? 'Accepted' : 'Wrong Answer',
-    executionTime: results.reduce((acc, r) => acc + (parseFloat(r.time) || 0), 0),
-    memoryUsed: results.reduce((acc, r) => acc + (parseInt(r.memory) || 0), 0)
-  });
-  // Update user's solved problems if accepted
-  if (allPassed) {
-    await User.findByIdAndUpdate(req.user._id, { $addToSet: { problemSolved: problem._id } });
-  }
-  return res.status(200).json(new ApiResponse(200, { submission, results }, allPassed ? 'Accepted' : 'Wrong Answer'));
+    language
+  );
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { submission, results }, allPassed ? "Accepted" : "Wrong Answer"));
 });
+
 
 export const getMySubmissionsForProblem = asyncHandler(async (req, res) => {
   const { problemId } = req.params;

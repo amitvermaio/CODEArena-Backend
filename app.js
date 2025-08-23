@@ -2,15 +2,12 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import cookieParser from 'cookie-parser';
-import MongoStore from 'connect-mongo';
-import passport from 'passport';
 import { join } from "path";
 
 import connectDB from './src/config/db.js';
 // import { initializePassport } from './src/config/passport.config.js';
 
 import mainApiRouter from './src/routes/routes.js';
-import { ApiResponse } from './src/utils/ApiResponse.js';
 import { ApiError } from './src/utils/ApiError.js';
 
 

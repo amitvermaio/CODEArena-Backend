@@ -1,6 +1,6 @@
 import Contest from '../models/contest/contest.model.js';
-import Problem from '../models/problem/problem.model.js';
-import Submission from '../models/problem/submission.model.js';
+import { Problem } from '../models/problem/problem.model.js';
+import { Submission } from '../models/problem/submission.model.js';
 import { User } from '../models/user/user.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';

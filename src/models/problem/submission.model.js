@@ -13,4 +13,4 @@ const submissionSchema = new Schema({
 submissionSchema.index({ user: 1, problem: 1 });
 
 const Submission = mongoose.model('Submission', submissionSchema);
-export default Submission;
+export { Submission };

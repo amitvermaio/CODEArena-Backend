@@ -28,7 +28,6 @@ router.post('/:problemId/submit', protect, submitSolution);
 // GET api/v1/problems/:problemId/submissions -> Get my submissions for a problem
 router.get('/:problemId/submissions', protect, getMySubmissionsForProblem);
 
-
 // --- Admin Routes ---
 // POST api/v1/problems -> Create a new problem
 router.post('/', protect, admin, createProblemValidation, handleValidationErrors, createProblem);
