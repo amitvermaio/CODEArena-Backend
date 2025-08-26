@@ -1,7 +1,45 @@
 import mongoose, { Schema } from 'mongoose';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import mongooseAggregatePaginate from 'mongoose-aggregate-paginate-v2';
+
+const profileColorEnum = [
+  "default",
+  "blue",
+  "green",
+  "purple",
+  "red",
+  "orange",
+  "yellow",
+  "pink",
+  "slate",
+  "stone",
+  "indigo",
+  "cyan"
+];
+
+const recentSubmissions = [
+{
+    problemId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Problem",
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"],
+      required: true
+    },
+      language: {
+      type: String,
+      required: true
+    },
+    submittedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }
+];
+
 
 const UserSchema = new Schema({
     username: {
@@ -13,6 +51,11 @@ const UserSchema = new Schema({
         minlength: 3,
         maxlength: 30,
         index: true, 
+    },
+    profileColor: {
+        type: String,
+        enum: profileColorEnum,
+        default: 'blue'
     },
     email: {
         type: String,
@@ -35,11 +78,13 @@ const UserSchema = new Schema({
     },
     avatar: {
         type: String, // cloundinary url
-        default: "https://icon-library.com/images/default-user-icon/default-user-icon-6.jpg",
     },
     problemSolved: [
         { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }
-    ], // Server-managed: Only modified upon successful problem submission
+    ],
+    problemAttempted: [
+        { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' },
+    ],
     location: {
         type: String,
         default: 'Earth', 
@@ -72,6 +117,7 @@ const UserSchema = new Schema({
         default: '',
         maxlength: 350, 
     },
+    recentSubmissions: recentSubmissions,
     // Fields to store OAuth provider IDs
     googleId: {
         type: String,

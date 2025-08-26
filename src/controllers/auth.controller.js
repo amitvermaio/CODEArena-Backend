@@ -18,6 +18,9 @@ const generateAndSetTokens = async (res, user) => {
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
+    // console.log('Generated new access token:', accessToken ? 'SUCCESS' : 'FAILED');
+    // console.log('Generated new refresh token:', refreshToken ? 'SUCCESS' : 'FAILED');
+
     // Store refresh token in the database
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });
@@ -29,11 +32,10 @@ const generateAndSetTokens = async (res, user) => {
 
     res.cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 }) // 15 mins
        .cookie(process.env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, { ...cookieOptions, maxAge: 30 * 24 * 60 * 60 * 1000 }); // 30 days
-
+    // console.log('Cookies set successfully');
     return userResponse;
 };
 
-// Controller for local registration
 export const registerUser = asyncHandler(async (req, res) => {
     const user = await registerUserService(req.body);
     const userResponse = await generateAndSetTokens(res, user);
@@ -41,12 +43,10 @@ export const registerUser = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(201, userResponse, "User registered successfully"));
 });
 
-// Controller for successful local login (actual auth is in middleware)
 export const loginSuccess = (req, res) => {
     res.status(200).json(new ApiResponse(200, req.user, "Login successful"));
 };
 
-// Controller for local login
 export const loginUser = asyncHandler(async (req, res) => {
     try {
         const { email, username, password } = req.body;
@@ -67,19 +67,16 @@ export const loginFailure = (req, res) => {
     res.status(401).json(new ApiResponse(401, null, "Invalid credentials"));
 };
 
-// This is the callback for all successful OAuth logins
+
 export const oauthCallback = (req, res) => {
-    // Redirect to your frontend dashboard or home page
     res.redirect(`${process.env.CORS_ORIGIN}/dashboard`);
 };
 
-// Controller for getting the current user's data
 export const getMe = asyncHandler(async (req, res) => {
-    // req.user is populated by the auth middleware
+    console.log(req.user);
     return res.status(200).json(new ApiResponse(200, req.user, "User data fetched successfully"));
 });
 
-// Controller for logging out
 export const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
@@ -97,20 +94,21 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
 export const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies[process.env.REFRESH_TOKEN_COOKIE_NAME];
-
+    // console.log('Refresh token from cookie:', incomingRefreshToken ? 'EXISTS' : 'MISSING');
+    // console.log('All cookies:', req.cookies);
     if (!incomingRefreshToken) {
         throw new ApiError(401, "Unauthorized request: No refresh token");
     }
 
     const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
-
     const user = await User.findById(decodedToken._id).select('+refreshToken');
+
     if (!user || user.refreshToken !== incomingRefreshToken) {
         throw new ApiError(401, "Invalid refresh token");
     }
 
     const userResponse = await generateAndSetTokens(res, user);
-    
+    // console.log('Token refresh completed successfully');
     return res.status(200).json(new ApiResponse(200, { user: userResponse }, "Access token refreshed"));
 });
 

@@ -4,7 +4,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 
 
 export const registerUserService = async (userData) => {
-    const { username, email, password } = userData;
+    const { fullname, username, email, password } = userData;
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
@@ -12,6 +12,7 @@ export const registerUserService = async (userData) => {
     }
 
     const user = await User.create({
+        fullname,
         username,
         email,
         password,

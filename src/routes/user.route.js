@@ -24,7 +24,7 @@ router.get('/profile/:username', getUserProfile);
 // @route   PUT /api/v1/users/profile
 // @desc    Update the logged-in user's profile
 // @access  Private
-router.put('/profile', protect, updateAccountDetails);
+router.patch('/me', protect, updateAccountDetails);
 
 // --- Connection Routes ---
 
