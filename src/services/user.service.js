@@ -9,3 +9,18 @@ export const getUserProfileService = async (username) => {
         throw new Error(`Error fetching user profile: ${error.message}`);
     }
 };
+
+export const validateUpdationFields = async () => {
+    if (!fullName && !bio && !location && !skills && !socialLinks && !website && !profileColor) {
+        throw new ApiError(400, "At least one field to update is required");
+    }
+    if (skills && !Array.isArray(skills)) {  }
+    if (socialLinks && typeof socialLinks !== 'object') {  }
+    if (profileColor) {
+        const allowedColors = [];
+        if (!allowedColors.includes(profileColor)) {
+            throw new ApiError(400, "Invalid profile color");
+        }
+    }
+
+}

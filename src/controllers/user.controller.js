@@ -104,19 +104,67 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const { fullName, email } = req.body;
+    const { 
+        fullName, 
+        bio, 
+        location, 
+        skills, 
+        socialLinks, 
+        website, 
+        profileColor 
+    } = req.body;
 
-    if (!fullName && !email) {
-        throw new ApiError(400, "At least one field to update is required");
+
+    try {
+        if (!fullName && !bio && !location && !skills && !socialLinks && !website && !profileColor) {
+            throw new ApiError(400, "At least one field to update is required");
+        }
+    
+        const updateFields = {};
+        
+        if (fullName !== undefined) updateFields.fullName = fullName;
+        if (bio !== undefined) updateFields.bio = bio;
+        if (location !== undefined) updateFields.location = location;
+        if (skills !== undefined) updateFields.skills = skills;
+        if (socialLinks !== undefined) updateFields.socialLinks = socialLinks;
+        if (website !== undefined) updateFields.website = website;
+        if (profileColor !== undefined) updateFields.profileColor = profileColor;
+    
+        console.log(updateFields);
+        if (skills && !Array.isArray(skills)) {
+            throw new ApiError(400, "Skills must be an array");
+        }
+    
+        if (socialLinks && typeof socialLinks !== 'object') {
+            throw new ApiError(400, "Social links must be an object");
+        }
+    
+        if (profileColor) {
+            const allowedColors = ["default", "blue", "green", "purple", "red", "orange", "yellow", "pink", "slate", "stone", "indigo", "cyan"];
+            if (!allowedColors.includes(profileColor)) {
+                throw new ApiError(400, "Invalid profile color");
+            }
+        }
+    
+        const user = await User.findByIdAndUpdate(
+            req.user?._id,
+            { $set: updateFields },
+            { new: true, runValidators: true }
+        ).select("-password");
+    
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
+        
+        console.log("User: ", user);
+    
+        return res.status(200).json(
+            new ApiResponse(200, user, "Account details updated successfully")
+        );
+    } catch (error) {
+        console.log(error)
+        throw new ApiError(400, error.message);
     }
-
-    const user = await User.findByIdAndUpdate(
-        req.user?._id,
-        { $set: { fullName, email } },
-        { new: true }
-    ).select("-password");
-
-    return res.status(200).json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {

@@ -10,6 +10,7 @@ import {
   updateAccountDetails,
   followUser,
   unfollowUser,
+  updateUserAvatar,
   searchUsers,
   getUserBadges,
   getNotifications,
@@ -21,10 +22,15 @@ import {
 // @access  Public
 router.get('/profile/:username', getUserProfile);
 
-// @route   PUT /api/v1/users/profile
+// @route   PATCH /api/v1/users/profile
 // @desc    Update the logged-in user's profile
 // @access  Private
 router.patch('/me', protect, updateAccountDetails);
+
+// @route POST /api/v1/users/:username/upload
+// desc Upload user's avatar photo
+// @access Private
+router.post('/upload', protect, updateUserAvatar);
 
 // --- Connection Routes ---
 
