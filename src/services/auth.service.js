@@ -29,13 +29,17 @@ export const loginUserService = async ({ email, username, password }) => {
     if (!email && !username) {
         throw new ApiError(400, "Username or email is required");
     }
-
+    
     const user = await User.findOne({
         $or: [{ email }, { username }]
     }).select('+password');    
-
+    
     if (!user) {
         throw new ApiError(404, "User not found");
+    }
+
+    if (user.isDeleted) {
+        throw new ApiError(403, "User account is deactivated. Contact Support.");
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password);

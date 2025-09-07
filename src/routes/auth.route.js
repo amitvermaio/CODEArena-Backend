@@ -35,6 +35,9 @@ router.post('/login/passport',
     loginSuccess
 );
 
+router.get('/login/success', protect, loginSuccess);
+
+
 // @route   POST api/v1/auth/verify-otp
 // router.post('/verify-otp', sendVerifyOtp);
 

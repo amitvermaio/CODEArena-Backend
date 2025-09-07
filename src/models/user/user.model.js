@@ -139,10 +139,11 @@ const UserSchema = new Schema({
         default: false,
         select: false, 
     },
-    isActive: {
-        type: Boolean,
-        default: true, 
-        select: false, 
+    status: {
+        type: String,
+        enum: ['active', 'banned'],
+        default: 'active', 
+        select: false,
     },
     isDeleted: {
         type: Boolean,

@@ -59,6 +59,7 @@ app.use('/api/v1', mainApiRouter);
 
 // Handle favicon requests to prevent 404 errors and the strict default CSP
 app.get('/favicon.ico', (req, res) => res.status(204).send());
+app.get('/', (req, res) => res.send('API is running...'));
 
 
 // Global Error Handling Middleware

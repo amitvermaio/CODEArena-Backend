@@ -32,38 +32,6 @@ router.patch('/me', protect, updateAccountDetails);
 // @access Private
 router.post('/upload', protect, updateUserAvatar);
 
-// --- Connection Routes ---
-
-// @route   GET /api/v1/users/connections
-// @desc    Get the logged-in user's connections
-// @access  Private
-router.get('/connections', protect, getConnections);
-
-// @route   POST /api/v1/users/connections/request/:userId
-// @desc    Send a connection request to another user
-// @access  Private
-router.post('/connections/request/:userId', protect, sendConnectionRequest);
-
-// @route   POST /api/v1/users/connections/accept/:requestId
-// @desc    Accept a connection request
-// @access  Private
-router.post('/connections/accept/:requestId', protect, acceptConnectionRequest);
-
-// @route   DELETE /api/v1/users/connections/:userId
-// @desc    Remove a connection
-// @access  Private
-router.delete('/connections/:userId', protect, removeConnection);
-
-// @route   POST /api/v1/users/:username/follow
-// @desc    Follow a user
-// @access  Private
-router.post('/:username/follow', protect, followUser);
-
-// @route   POST /api/v1/users/:username/unfollow
-// @desc    Unfollow a user
-// @access  Private
-router.post('/:username/unfollow', protect, unfollowUser);
-
 export default router;
 
 /*
@@ -91,39 +59,6 @@ router.put('/account', protect, updateAccountDetails);
 // @desc    Get a user's badges
 // @access  Public
 router.get('/:username/badges', getUserBadges);
-
-
-// --- Follow, Connections & Notification Routes ---
-
-// @route   GET /api/v1/users/connections
-// @desc    Get the logged-in user's connections
-// @access  Private
-router.get('/connections', protect, getConnections);
-
-// @route   POST /api/v1/users/connections/requests/:userId
-// @desc    Send a connection request to another user
-// @access  Private
-router.post('/connections/requests/:userId', protect, sendConnectionRequest);
-
-// @route   PATCH /api/v1/users/connections/requests/:requestId
-// @desc    Accept a connection request
-// @access  Private
-router.patch('/connections/requests/:requestId', protect, acceptConnectionRequest);
-
-// @route   DELETE /api/v1/users/connections/:userId
-// @desc    Remove a connection
-// @access  Private
-router.delete('/connections/:userId', protect, removeConnection);
-
-// @route   POST /api/v1/users/follow/:username
-// @desc    Follow a user
-// @access  Private
-router.post('/follow/:username', protect, followUser);
-
-// @route   DELETE /api/v1/users/follow/:username
-// @desc    Unfollow a user
-// @access  Private
-router.delete('/follow/:username', protect, unfollowUser);
 
 // @route   GET /api/v1/users/notifications
 // @desc    Get notifications for the logged-in user

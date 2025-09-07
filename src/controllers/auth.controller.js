@@ -44,12 +44,17 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginSuccess = (req, res) => {
-    res.status(200).json(new ApiResponse(200, req.user, "Login successful"));
+    res.status(200).json(new ApiResponse(200, req.user, "User Logged in"));
 };
 
 export const loginUser = asyncHandler(async (req, res) => {
     try {
         const { email, username, password } = req.body;
+
+        if (!email && !username) {
+            throw new ApiError(400, "Email or username required!");
+        }
+        
         const { user, accessToken, refreshToken } = await loginUserService({ email, username, password });
         
         res.cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 })
@@ -57,7 +62,7 @@ export const loginUser = asyncHandler(async (req, res) => {
         
         return res.status(200).json(new ApiResponse(200, user, "User logged in successfully"));
     } catch (error) {
-        throw new ApiError(404, "Email or username required!", error.message);
+        throw new ApiError(404, "User not found", error.message);
     }
 });
 
