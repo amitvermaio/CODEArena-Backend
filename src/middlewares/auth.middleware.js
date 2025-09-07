@@ -1,7 +1,7 @@
-import jwt from 'jsonwebtoken';
-import { User } from '../models/user/user.model.js';
-import { ApiError } from '../utils/ApiError.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
+import jwt from "jsonwebtoken";
+import { User } from "../models/user/user.model.js";
+import { ApiError } from "../utils/ApiError.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const protect = asyncHandler(async (req, _, next) => {
   const token =
@@ -14,15 +14,19 @@ export const protect = asyncHandler(async (req, _, next) => {
 
   try {
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const user = await User.findById(decodedToken?._id)
-      .select("-password +role +isDeleted");
+    const user = await User.findById(decodedToken?._id).select(
+      "-password +role +isDeleted"
+    );
 
     if (!user) {
       throw new ApiError(401, "Invalid Access Token: User not found");
     }
 
     if (user.isDeleted) {
-      throw new ApiError(403, "This account has been deactivated. Contact admin.");
+      throw new ApiError(
+        403,
+        "This account has been deactivated. Contact admin."
+      );
     }
 
     if (user.status === "banned") {
@@ -33,7 +37,10 @@ export const protect = asyncHandler(async (req, _, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      throw new ApiError(401, "Access token expired. Please refresh your token.");
+      throw new ApiError(
+        401,
+        "Access token expired. Please refresh your token."
+      );
     }
     throw new ApiError(401, error?.message || "Invalid Access Token");
   }

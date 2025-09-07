@@ -4,12 +4,17 @@ import { Submission } from "../models/problem/submission.model.js";
 import { User } from "../models/user/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
-
 const JUDGE0_URL = process.env.JUDGE0_URL;
 const JUDGE0_HEADERS = { "x-rapidapi-key": process.env.JUDGE0_API_KEY };
 
-export const submitSolutionService = async (user, problemId, code, language) => {
-  if (!code || !language) throw new ApiError(400, "Code and language are required");
+export const submitSolutionService = async (
+  user,
+  problemId,
+  code,
+  language
+) => {
+  if (!code || !language)
+    throw new ApiError(400, "Code and language are required");
 
   const problem = await Problem.findOne({ slug: problemId });
   if (!problem) throw new ApiError(404, "Problem not found");
@@ -49,12 +54,17 @@ export const submitSolutionService = async (user, problemId, code, language) => 
     code,
     language,
     status: allPassed ? "Accepted" : "Wrong Answer",
-    executionTime: results.reduce((acc, r) => acc + (parseFloat(r.time) || 0), 0),
+    executionTime: results.reduce(
+      (acc, r) => acc + (parseFloat(r.time) || 0),
+      0
+    ),
     memoryUsed: results.reduce((acc, r) => acc + (parseInt(r.memory) || 0), 0),
   });
 
   if (allPassed) {
-    await User.findByIdAndUpdate(user._id, { $addToSet: { problemSolved: problem._id } });
+    await User.findByIdAndUpdate(user._id, {
+      $addToSet: { problemSolved: problem._id },
+    });
   }
 
   return { submission, results, allPassed };

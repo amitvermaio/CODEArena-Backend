@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -14,188 +14,196 @@ const profileColorEnum = [
   "slate",
   "stone",
   "indigo",
-  "cyan"
+  "cyan",
 ];
 
 const recentSubmissions = [
-{
+  {
     problemId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Problem",
-      required: true
+      required: true,
     },
     status: {
       type: String,
-      enum: ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"],
-      required: true
+      enum: [
+        "Accepted",
+        "Wrong Answer",
+        "Time Limit Exceeded",
+        "Runtime Error",
+      ],
+      required: true,
     },
-      language: {
+    language: {
       type: String,
-      required: true
+      required: true,
     },
     submittedAt: {
       type: Date,
-      default: Date.now
-    }
-  }
+      default: Date.now,
+    },
+  },
 ];
 
-
-const UserSchema = new Schema({
+const UserSchema = new Schema(
+  {
     username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
-        minlength: 3,
-        maxlength: 30,
-        index: true, 
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      minlength: 3,
+      maxlength: 30,
+      index: true,
     },
     profileColor: {
-        type: String,
-        enum: profileColorEnum,
-        default: 'blue'
+      type: String,
+      enum: profileColorEnum,
+      default: "blue",
     },
     email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
     },
     // Password is now optional, for users who sign up via OAuth
     password: {
-        type: String,
-        required: false, 
-        minlength: 6,
+      type: String,
+      required: false,
+      minlength: 6,
     },
-    fullname: { 
-        type: String,
-        trim: true,
-        minlength: 3,
-        maxlength: 50,
+    fullname: {
+      type: String,
+      trim: true,
+      minlength: 3,
+      maxlength: 50,
     },
     avatar: {
-        type: String, // cloundinary url
+      type: String, // cloundinary url
     },
-    problemSolved: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }
-    ],
+    problemSolved: [{ type: mongoose.Schema.Types.ObjectId, ref: "Problem" }],
     problemAttempted: [
-        { type: mongoose.Schema.Types.ObjectId, ref: 'Problem' },
+      { type: mongoose.Schema.Types.ObjectId, ref: "Problem" },
     ],
     location: {
-        type: String,
-        default: 'Earth', 
-        trim: true,
+      type: String,
+      default: "Earth",
+      trim: true,
     },
     website: {
-        type: String,
-        default: ''
+      type: String,
+      default: "",
     },
     socialLinks: {
-        github: {
-            type: String,
-            default: ''
-        },
-        linkedin: {
-            type: String,
-            default: ''
-        },
-        twitter: {
-            type: String,
-            default: ''
-        },
+      github: {
+        type: String,
+        default: "",
+      },
+      linkedin: {
+        type: String,
+        default: "",
+      },
+      twitter: {
+        type: String,
+        default: "",
+      },
     },
-    skills: [{
+    skills: [
+      {
         type: String,
-        trim: true
-    }],
+        trim: true,
+      },
+    ],
     bio: {
-        type: String,
-        default: '',
-        maxlength: 350, 
+      type: String,
+      default: "",
+      maxlength: 350,
     },
     recentSubmissions: recentSubmissions,
     // Fields to store OAuth provider IDs
     googleId: {
-        type: String,
-        immutable: true, 
+      type: String,
+      immutable: true,
     },
     githubId: {
-        type: String,
-        immutable: true,
+      type: String,
+      immutable: true,
     },
     role: {
-        type: String,
-        enum: ['user', 'admin'],
-        default: 'user',
-        select: false, 
-        immutable: true, 
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+      select: false,
+      immutable: true,
     },
     isEmailVerified: {
-        type: Boolean,
-        default: false,
-        select: false, 
+      type: Boolean,
+      default: false,
+      select: false,
     },
     status: {
-        type: String,
-        enum: ['active', 'banned'],
-        default: 'active', 
-        select: false,
+      type: String,
+      enum: ["active", "banned"],
+      default: "active",
+      select: false,
     },
     isDeleted: {
-        type: Boolean,
-        default: false, 
-        select: false,
+      type: Boolean,
+      default: false,
+      select: false,
     },
     refreshToken: {
-        type: String,
-        select: false,
+      type: String,
+      select: false,
     },
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 // Pre-save hook to hash password if it's provided/modified
-UserSchema.pre('save', async function(next) { // we're not using arrow fn here coz it doesn't have access to refrence "this"!!
-    if (!this.isModified('password') || !this.password) {
-        return next();
-    }
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
+UserSchema.pre("save", async function (next) {
+  // we're not using arrow fn here coz it doesn't have access to refrence "this"!!
+  if (!this.isModified("password") || !this.password) {
+    return next();
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Method to compare passwords for local login
-UserSchema.methods.isPasswordCorrect = async function(enteredPassword) {
-    return await bcrypt.compare(enteredPassword, this.password);
+UserSchema.methods.isPasswordCorrect = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
 // Method to generate access token
 UserSchema.methods.generateAccessToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-            username: this.username,
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-        }
-    );
+  return jwt.sign(
+    {
+      _id: this._id,
+      username: this.username,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    }
+  );
 };
 
 // Method to generate refresh token
 UserSchema.methods.generateRefreshToken = function () {
-    return jwt.sign(
-        {
-            _id: this._id,
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-        }
-    );
+  return jwt.sign(
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
 };
 
-export const User = mongoose.model('User', UserSchema);
+export const User = mongoose.model("User", UserSchema);

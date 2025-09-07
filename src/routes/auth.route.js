@@ -1,42 +1,52 @@
-import express from 'express';
-import passport from 'passport';
-import { registerValidation, loginValidation } from '../validations/auth.validation.js';
-import { handleValidationErrors } from '../middlewares/validation.middleware.js';
-import { protect } from '../middlewares/auth.middleware.js';
+import express from "express";
+import passport from "passport";
 import {
-    registerUser,
-    loginUser,
-    loginSuccess,
-    loginFailure,
-    oauthCallback,
-    getMe,
-    logoutUser,
-    refreshAccessToken
-} from '../controllers/auth.controller.js';
+  registerValidation,
+  loginValidation,
+} from "../validations/auth.validation.js";
+import { handleValidationErrors } from "../middlewares/validation.middleware.js";
+import { protect } from "../middlewares/auth.middleware.js";
+import {
+  registerUser,
+  loginUser,
+  loginSuccess,
+  loginFailure,
+  oauthCallback,
+  getMe,
+  logoutUser,
+  refreshAccessToken,
+} from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
 // --- Local Authentication ---
 // @route   POST api/v1/auth/register
-router.post('/register', registerValidation, handleValidationErrors,  registerUser);
-
-// Custom login with email/username and password
-router.post('/login', loginValidation, handleValidationErrors, loginUser);
-
-// Logout 
-router.post('/logout', protect, logoutUser);
-
-// Refresh Token POST api/v1/auth/refresh-token
-router.post('/refresh-token', refreshAccessToken);
-
-// Passport login (optional)
-router.post('/login/passport',
-    passport.authenticate('local', { failureRedirect: '/api/auth/login-failure' }),
-    loginSuccess
+router.post(
+  "/register",
+  registerValidation,
+  handleValidationErrors,
+  registerUser
 );
 
-router.get('/login/success', protect, loginSuccess);
+// Custom login with email/username and password
+router.post("/login", loginValidation, handleValidationErrors, loginUser);
 
+// Logout
+router.post("/logout", protect, logoutUser);
+
+// Refresh Token POST api/v1/auth/refresh-token
+router.post("/refresh-token", refreshAccessToken);
+
+// Passport login (optional)
+router.post(
+  "/login/passport",
+  passport.authenticate("local", {
+    failureRedirect: "/api/auth/login-failure",
+  }),
+  loginSuccess
+);
+
+router.get("/login/success", protect, loginSuccess);
 
 // @route   POST api/v1/auth/verify-otp
 // router.post('/verify-otp', sendVerifyOtp);
@@ -47,38 +57,45 @@ router.get('/login/success', protect, loginSuccess);
 // @route   POST api/v1/auth/password-reset-otp
 // router.post('/password-reset-otp', null);
 
-
 // @route   POST api/v1/auth/password-reset-otp
 // router.post('/reset-password', resetPassword);
 
 // @route   GET api/auth/login-failure (helper route)
-router.get('/login-failure', loginFailure);
+router.get("/login-failure", loginFailure);
 
 // --- Google OAuth ---
 // @route   GET api/auth/google (Kicks off the authentication process)
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get(
+  "/google",
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
 // @route   GET api/auth/google/callback (Google redirects here after login)
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/' }), // Redirect to frontend home on failure
-    oauthCallback
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { failureRedirect: "/" }), // Redirect to frontend home on failure
+  oauthCallback
 );
 
 // --- GitHub OAuth ---
 // @route   GET api/auth/github
-router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] })
+);
 
 // @route   GET api/auth/github/callback
-router.get('/github/callback',
-    passport.authenticate('github', { failureRedirect: '/' }),
-    oauthCallback
+router.get(
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/" }),
+  oauthCallback
 );
 
 // --- Session Management ---
 // @route   GET api/auth/me (Check login status and get user data)
-router.get('/me', protect, getMe);
+router.get("/me", protect, getMe);
 
 // @route   POST api/auth/logout
-router.post('/logout', protect, logoutUser);
+router.post("/logout", protect, logoutUser);
 
 export default router;
