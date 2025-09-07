@@ -2,6 +2,8 @@ import ImageKit from "imagekit";
 import mongoose from "mongoose";
 import { ApiError } from "./ApiError.js";
 
+// Cloud 
+
 const imagekit = new ImageKit({
   publicKey: process.env.IMAGEKIT_PUBLIC_KEY,
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY,
