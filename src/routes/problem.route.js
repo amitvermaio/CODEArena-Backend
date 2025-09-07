@@ -1,10 +1,10 @@
 import express from 'express';
 import { protect } from '../middlewares/auth.middleware.js';
-import { createProblemValidation, handleValidationErrors } from '../validations/problem.validation.js';
+import { createProblemValidation, handleProblemsValidationErrors } from '../validations/problem.validation.js';
 
 import {
   getAllProblems,
-  getProblemById,
+  getProblemBySlug,
   submitSolution,
   getMySubmissionsForProblem,
 } from '../controllers/problem.controller.js';
@@ -17,7 +17,7 @@ const router = express.Router();
 router.get('/', protect, getAllProblems);
 
 // GET api/v1/problems/:problemId -> Get a single problem
-router.get('/:problemId', getProblemById);
+router.get('/:slug', getProblemBySlug);
 
 // POST api/v1/problems/:problemId/submit -> Submit solution
 router.post('/:problemId/submit', protect, submitSolution);

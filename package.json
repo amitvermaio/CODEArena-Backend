@@ -14,7 +14,6 @@
   "dependencies": {
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
-    "cloudinary": "^2.7.0",
     "connect-mongo": "^5.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -22,6 +21,7 @@
     "express": "^5.1.0",
     "express-session": "^1.18.1",
     "express-validator": "^7.2.1",
+    "imagekit": "^6.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.16.0",
     "mongoose-aggregate-paginate-v2": "^1.1.4",

@@ -22,8 +22,9 @@ export const getAllProblems = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, problems, 'All problems'));
 });
 
-export const getProblemById = asyncHandler(async (req, res) => {
-  const problem = await Problem.findOne({ slug: req.params.problemId });
+export const getProblemBySlug = asyncHandler(async (req, res) => {
+  const slug = req.params;
+  const problem = await Problem.findOne({ slug });
   if (!problem) {
     throw new ApiError(404, 'Problem not found');
   }
@@ -80,35 +81,56 @@ export const getMySubmissionsForProblem = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, submissions, 'My submissions for problem'));
 });
 
+/* =============================
+  Admin Controller Functions 
+============================= */
+
 export const createProblem = asyncHandler(async (req, res) => {
-  const { title, statement, difficulty, tags, constraints, testCases, timeLimit, memoryLimit, editorial } = req.body;
-  if (!title || !statement || !difficulty || !constraints || !testCases) throw new ApiError(400, 'Missing required fields');
-  const problem = await Problem.create({
-    title,
-    statement,
-    difficulty,
-    tags,
-    constraints,
-    testCases,
-    timeLimit,
-    memoryLimit,
-    author: req.user._id,
-    editorial
-  });
-  return res.status(201).json(new ApiResponse(201, problem, 'Problem created'));
+    const { title, statement, difficulty, constraints, testCases, timeLimit, memoryLimit, tags, editorial } = req.body;
+
+    const existingProblem = await Problem.findOne({ title });
+    if (existingProblem) {
+        return res.send(new ApiResponse(400, "Problem with this title already exists"));
+    }
+
+    const problem = new Problem({
+        title,
+        statement,
+        difficulty,
+        constraints,
+        testCases,
+        timeLimit,
+        memoryLimit,
+        tags,
+        editorial,
+        author: req.user?._id, 
+    });
+
+    await problem.save(); 
+
+    return res
+        .status(201)
+        .json(new ApiResponse(201, problem, "Problem created successfully"));
 });
 
 export const updateProblem = asyncHandler(async (req, res) => {
-  const { problemId } = req.params;
-  const update = req.body;
-  const problem = await Problem.findByIdAndUpdate(problemId, update, { new: true });
-  if (!problem) throw new ApiError(404, 'Problem not found');
-  return res.status(200).json(new ApiResponse(200, problem, 'Problem updated'));
+    const { problemId } = req.params;
+    const updatedProblem = await Problem.findByIdAndUpdate(problemId, req.body, { new: true });
+
+    if (!updatedProblem) {
+        throw new ApiError(404, "Problem not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, updatedProblem, "Problem updated successfully"));
 });
 
 export const deleteProblem = asyncHandler(async (req, res) => {
-  const { problemId } = req.params;
-  const problem = await Problem.findByIdAndDelete(problemId);
-  if (!problem) throw new ApiError(404, 'Problem not found');
-  return res.status(200).json(new ApiResponse(200, {}, 'Problem deleted'));
+    const { problemId } = req.params;
+    const deletedProblem = await Problem.findByIdAndDelete(problemId);
+
+    if (!deletedProblem) {
+        throw new ApiError(404, "Problem not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, null, "Problem deleted successfully"));
 });

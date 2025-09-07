@@ -1,6 +1,6 @@
 import { User } from "../models/user/user.model.js";
 import { Problem } from "../models/problem/problem.model.js";
-// import { Contest } from "../models/contest/contest.model.js";
+import { Contest } from "../models/contest/contest.model.js";
 
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -141,34 +141,34 @@ export const deleteProblem = asyncHandler(async (req, res) => {
    CONTEST MANAGEMENT
 ============================= */
 
-// export const getAllContests = asyncHandler(async (req, res) => {
-//     const contests = await Contest.find({});
-//     return res.status(200).json(new ApiResponse(200, contests, "Contests fetched successfully"));
-// });
+export const getAdminAllContests = asyncHandler(async (req, res) => {
+    const contests = await Contest.find({});
+    return res.status(200).json(new ApiResponse(200, contests, "Contests fetched successfully"));
+});
 
-// export const createContest = asyncHandler(async (req, res) => {
-//     const contest = await Contest.create(req.body);
-//     return res.status(201).json(new ApiResponse(201, contest, "Contest created successfully"));
-// });
+export const createContest = asyncHandler(async (req, res) => {
+    const contest = await Contest.create(req.body);
+    return res.status(201).json(new ApiResponse(201, contest, "Contest created successfully"));
+});
 
-// export const updateContest = asyncHandler(async (req, res) => {
-//     const { contestId } = req.params;
-//     const updatedContest = await Contest.findByIdAndUpdate(contestId, req.body, { new: true });
+export const updateContest = asyncHandler(async (req, res) => {
+    const { contestId } = req.params;
+    const updatedContest = await Contest.findByIdAndUpdate(contestId, req.body, { new: true });
 
-//     if (!updatedContest) {
-//         throw new ApiError(404, "Contest not found");
-//     }
+    if (!updatedContest) {
+        throw new ApiError(404, "Contest not found");
+    }
 
-//     return res.status(200).json(new ApiResponse(200, updatedContest, "Contest updated successfully"));
-// });
+    return res.status(200).json(new ApiResponse(200, updatedContest, "Contest updated successfully"));
+});
 
-// export const deleteContest = asyncHandler(async (req, res) => {
-//     const { contestId } = req.params;
-//     const deletedContest = await Contest.findByIdAndDelete(contestId);
+export const deleteContest = asyncHandler(async (req, res) => {
+    const { contestId } = req.params;
+    const deletedContest = await Contest.findByIdAndDelete(contestId);
 
-//     if (!deletedContest) {
-//         throw new ApiError(404, "Contest not found");
-//     }
+    if (!deletedContest) {
+        throw new ApiError(404, "Contest not found");
+    }
 
-//     return res.status(200).json(new ApiResponse(200, null, "Contest deleted successfully"));
-// });
+    return res.status(200).json(new ApiResponse(200, null, "Contest deleted successfully"));
+});

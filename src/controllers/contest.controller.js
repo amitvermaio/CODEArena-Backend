@@ -1,10 +1,11 @@
-import Contest from '../models/contest/contest.model.js';
+import { Contest } from '../models/contest/contest.model.js';
 import { Problem } from '../models/problem/problem.model.js';
 import { Submission } from '../models/problem/submission.model.js';
 import { User } from '../models/user/user.model.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { ApiError } from '../utils/ApiError.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
+import { uploadFile, deleteFile } from "../utils/ImageKit.js";
 
 // Get all contests (upcoming, ongoing, past)
 export const getAllContests = asyncHandler(async (req, res) => {
@@ -85,35 +86,87 @@ export const submitContestSolution = asyncHandler(async (req, res) => {
 });
 
 // Admin: Create a new contest
+export const getAdminAllContests = asyncHandler(async (req, res) => {
+    const contests = await Contest.find({});
+    return res.status(200).json(new ApiResponse(200, contests, "Contests fetched successfully"));
+});
+
 export const createContest = asyncHandler(async (req, res) => {
-  const { title, description, type, startTime, endTime, problems, sponsoredBy } = req.body;
-  if (!title || !description || !type || !startTime || !endTime || !problems) throw new ApiError(400, 'Missing required fields');
-  const contest = await Contest.create({
-    title,
-    description,
-    type,
-    startTime,
-    endTime,
-    problems,
-    sponsoredBy,
-    createdBy: req.user._id
-  });
-  return res.status(201).json(new ApiResponse(201, contest, 'Contest created'));
+    const {
+        title,
+        description,
+        startTime,
+        endTime,
+        registrationDeadline,
+        visibility,
+        maxParticipants,
+        problems,
+    } = req.body;
+
+    if (!req.file) {
+        throw new ApiError(400, "Cover image is required");
+    }
+
+    const existedContest = await Contest.findOne({ title });
+    if (existedContest) {
+      return res.status(404).send(new ApiResponse(404, "Contest With This Title already existed", false));
+    }
+
+    console.log("req.file: \n", req.file);
+    try {
+      const coverImage = await uploadFile(req.file, "Contests");
+      console.log("Coverimage: \n", coverImage);
+      
+      const contest = await Contest.create({
+          coverImage: coverImage.url,
+          coverImageId: coverImage.fileId,
+          title,
+          description,
+          startTime,
+          endTime,
+          registrationDeadline,
+          visibility,
+          maxParticipants,
+          problems,
+          createdBy: req.user._id,
+      });
+  
+      return res
+          .status(201)
+          .json(new ApiResponse(201, contest, "Contest created successfully"));
+    } catch (error) {
+      throw new ApiError(500, error.message);
+    }
 });
 
-// Admin: Update a contest
+
+// ! Pending Not did anything yet!
 export const updateContest = asyncHandler(async (req, res) => {
-  const { contestId } = req.params;
-  const update = req.body;
-  const contest = await Contest.findByIdAndUpdate(contestId, update, { new: true });
-  if (!contest) throw new ApiError(404, 'Contest not found');
-  return res.status(200).json(new ApiResponse(200, contest, 'Contest updated'));
+    const { contestId } = req.params;
+    const updatedContest = await Contest.findByIdAndUpdate(contestId, req.body, { new: true });
+
+    if (!updatedContest) {
+        throw new ApiError(404, "Contest not found");
+    }
+
+    return res.status(200).json(new ApiResponse(200, updatedContest, "Contest updated successfully"));
 });
 
-// Admin: Delete a contest
 export const deleteContest = asyncHandler(async (req, res) => {
-  const { contestId } = req.params;
-  const contest = await Contest.findByIdAndDelete(contestId);
-  if (!contest) throw new ApiError(404, 'Contest not found');
-  return res.status(200).json(new ApiResponse(200, {}, 'Contest deleted'));
+    const { contestId } = req.params;
+    const contest = await Contest.findById(contestId);
+
+    if (!contest) {
+      throw new ApiError(404, "Contest Not Found!")
+    }
+    
+    try {
+      await deleteFile(contest.coverImageId);
+      
+      await Contest.findByIdAndDelete(contestId);
+      
+      return res.status(200).json(new ApiResponse(200, null, "Contest deleted successfully"));
+    } catch (error) {
+      return res.send(new ApiError(500, "Error Deleting the Contest"));
+    }
 });

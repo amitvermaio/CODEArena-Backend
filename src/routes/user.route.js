@@ -2,14 +2,9 @@ import express from 'express';
 const router = express.Router();
 import { protect } from '../middlewares/auth.middleware.js';
 import {
-  getConnections,
-  sendConnectionRequest,
-  acceptConnectionRequest,
-  removeConnection,
+
   getUserProfile,
   updateAccountDetails,
-  followUser,
-  unfollowUser,
   updateUserAvatar,
   searchUsers,
   getUserBadges,
