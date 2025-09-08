@@ -10,6 +10,7 @@ import {
 import {
   createContestValidation,
   handleContestValidationErrors,
+  updateContestValidation,
 } from "../validations/contest.validation.js";
 import {
   getAllUsers,
@@ -83,7 +84,14 @@ router.post(
   createContest
 );
 
-router.put("/contests/:contestId", protect, admin /* updateContest */);
+router.patch(
+  "/contests/:contestId",
+  protect,
+  admin,
+  upload.single("coverImage"),
+  updateContestValidation,
+  updateContest
+);
 
 router.delete("/contests/:contestId", protect, admin, deleteContest);
 

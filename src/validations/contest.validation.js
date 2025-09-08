@@ -72,6 +72,31 @@ export const createContestValidation = [
     .withMessage("Each registrant must be a string (MongoDB ObjectId)"),
 ];
 
+import { ApiError } from "../utils/ApiError.js";
+
+export const updateContestValidation = (req, res, next) => {
+  const allowedUpdates = [
+    "title",
+    "description",
+    "coverImage",
+    "startTime",
+    "endTime",
+    "status",
+  ];
+
+  const bodyKeys = Object.keys(req.body);
+
+  const invalidFields = bodyKeys.filter((key) => !allowedUpdates.includes(key));
+  if (invalidFields.length > 0) {
+    throw new ApiError(
+      400,
+      `Invalid fields in update: ${invalidFields.join(", ")}`
+    );
+  }
+
+  next();
+};
+
 export const handleContestValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

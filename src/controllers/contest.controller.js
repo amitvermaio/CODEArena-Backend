@@ -168,17 +168,43 @@ export const createContest = asyncHandler(async (req, res) => {
 // ! Pending Not did anything yet!
 export const updateContest = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
-  const updatedContest = await Contest.findByIdAndUpdate(contestId, req.body, {
-    new: true,
-  });
+  const contest = await Contest.findById(contestId);
 
-  if (!updatedContest) {
+  if (!contest) {
     throw new ApiError(404, "Contest not found");
   }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, updatedContest, "Contest updated successfully"));
+  try {
+    if (req.file) {
+      await deleteFile(contest.coverImageId);
+    }
+
+    const uploadResponse = await uploadFile(req.file, "Contests");
+
+    req.body.coverImageId = uploadResponse.fileId;
+    req.body.coverImage = uploadResponse.url;
+
+    const updatedContest = await Contest.findByIdAndUpdate(
+      contestId,
+      req.body,
+      { new: true }
+    );
+    return res
+      .status(200)
+      .send(
+        new ApiResponse(200, updatedContest, "Contest Updated Successfully")
+      );
+  } catch (error) {
+    return res
+      .status(500)
+      .send(
+        new ApiError(
+          500,
+          error.message,
+          "Error While updating Contest details!"
+        )
+      );
+  }
 });
 
 export const deleteContest = asyncHandler(async (req, res) => {
