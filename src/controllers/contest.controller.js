@@ -138,7 +138,6 @@ export const createContest = asyncHandler(async (req, res) => {
       );
   }
 
-  console.log("req.file: \n", req.file);
   try {
     const coverImage = await uploadFile(req.file, "Contests");
     console.log("Coverimage: \n", coverImage);
@@ -165,7 +164,6 @@ export const createContest = asyncHandler(async (req, res) => {
   }
 });
 
-// ! Pending Not did anything yet!
 export const updateContest = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
   const contest = await Contest.findById(contestId);
