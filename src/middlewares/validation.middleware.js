@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 export const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
+  console.log(req.body);
   if (!errors.isEmpty()) {
     return res
       .status(400)

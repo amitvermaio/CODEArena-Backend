@@ -2,18 +2,25 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import blacklistTokenModel from "../models/user/blacklistToken.model.js";
 
 export const protect = asyncHandler(async (req, _, next) => {
   const token =
-    req.cookies?.[process.env.ACCESS_TOKEN_COOKIE_NAME] ||
-    req.header("Authorization")?.replace("Bearer ", "");
+    req.cookies?.[process.env.TOKEN_NAME] ||
+    req.headers.authorization?.split(" ")[1];
+    
 
   if (!token) {
     throw new ApiError(401, "Unauthorized request: No token provided");
   }
 
+  const isBlacklisted = await blacklistTokenModel.findOne({ token });
+  if (isBlacklisted) {
+    throw new ApiError(401, "Unauthorized request: Session Expired");
+  }
+
   try {
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decodedToken?._id).select(
       "-password +role +isDeleted"
     );

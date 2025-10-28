@@ -1,62 +1,27 @@
-import { User } from "../models/user/user.model.js";
 import {
   registerUserService,
   loginUserService,
 } from "../services/auth.service.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import jwt from "jsonwebtoken";
-
-import "../config/passport.config.js";
+import BlacklistToken from "../models/user/blacklistToken.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
-// Cookie options for security
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-};
-
-const generateAndSetTokens = async (res, user) => {
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
-
-  // console.log('Generated new access token:', accessToken ? 'SUCCESS' : 'FAILED');
-  // console.log('Generated new refresh token:', refreshToken ? 'SUCCESS' : 'FAILED');
-
-  // Store refresh token in the database
-  user.refreshToken = refreshToken;
-  await user.save({ validateBeforeSave: false });
-
-  // Remove sensitive data from user object before sending response
-  const userResponse = user.toObject();
-  delete userResponse.password;
-  delete userResponse.refreshToken;
-
-  res
-    .cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
-      ...cookieOptions,
-      maxAge: 15 * 60 * 1000,
-    }) // 15 mins
-    .cookie(process.env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-      ...cookieOptions,
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    }); // 30 days
-  // console.log('Cookies set successfully');
-  return userResponse;
-};
-
 export const registerUser = asyncHandler(async (req, res) => {
-  const user = await registerUserService(req.body);
-  const userResponse = await generateAndSetTokens(res, user);
+  const { user, token } = await registerUserService(req.body);
+  const userData = user.toObject();
+  delete userData.password;
+  delete user.status
+
+  res.cookie(process.env.TOKEN_NAME, token, {
+    httpOnly: true,
+    secure: true,
+  });
 
   return res
     .status(201)
-    .json(new ApiResponse(201, userResponse, "User registered successfully"));
+    .json(new ApiResponse(201, { user: userData, token }, "User registered successfully"));
 });
-
-export const loginSuccess = (req, res) => {
-  res.status(200).json(new ApiResponse(200, req.user, "User Logged in"));
-};
 
 export const loginUser = asyncHandler(async (req, res) => {
   try {
@@ -66,39 +31,24 @@ export const loginUser = asyncHandler(async (req, res) => {
       throw new ApiError(400, "Email or username required!");
     }
 
-    const { user, accessToken, refreshToken } = await loginUserService({
+    const { user, token } = await loginUserService({
       email,
       username,
       password,
     });
 
-    res
-      .cookie(process.env.ACCESS_TOKEN_COOKIE_NAME, accessToken, {
-        ...cookieOptions,
-        maxAge: 15 * 60 * 1000,
-      })
-      .cookie(process.env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-        ...cookieOptions,
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      });
+    res.cookie(process.env.TOKEN_NAME, token, {
+      httpOnly: true,
+      secure: true,
+    });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, user, "User logged in successfully"));
+      .json(new ApiResponse(200, { user, token }, "User logged in successfully"));
   } catch (error) {
     throw new ApiError(404, "User not found", error.message);
   }
 });
-
-// Controller for login failure (actual auth is in middleware)
-export const loginFailure = (req, res) => {
-  // Passport flash messages can be used here if you set it up
-  res.status(401).json(new ApiResponse(401, null, "Invalid credentials"));
-};
-
-export const oauthCallback = (req, res) => {
-  res.redirect(`${process.env.CORS_ORIGIN}/dashboard`);
-};
 
 export const getMe = asyncHandler(async (req, res) => {
   console.log(req.user);
@@ -108,48 +58,13 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  await User.findByIdAndUpdate(
-    req.user._id,
-    { $set: { refreshToken: undefined } }, // removes the field
-    { new: true }
-  );
-
-  // Clear cookies
-  res
-    .clearCookie(process.env.ACCESS_TOKEN_COOKIE_NAME, cookieOptions)
-    .clearCookie(process.env.REFRESH_TOKEN_COOKIE_NAME, cookieOptions);
-
+  
+  const token = res.cookies[process.env.TOKEN_NAME] || req.headers.authorization.split(" ")[1];
+  res.clearCookie(process.env.TOKEN_NAME);
+  await BlacklistToken.create({ token });
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
-});
-
-export const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken =
-    req.cookies[process.env.REFRESH_TOKEN_COOKIE_NAME];
-  // console.log('Refresh token from cookie:', incomingRefreshToken ? 'EXISTS' : 'MISSING');
-  // console.log('All cookies:', req.cookies);
-  if (!incomingRefreshToken) {
-    throw new ApiError(401, "Unauthorized request: No refresh token");
-  }
-
-  const decodedToken = jwt.verify(
-    incomingRefreshToken,
-    process.env.REFRESH_TOKEN_SECRET
-  );
-  const user = await User.findById(decodedToken._id).select("+refreshToken");
-
-  if (!user || user.refreshToken !== incomingRefreshToken) {
-    throw new ApiError(401, "Invalid refresh token");
-  }
-
-  const userResponse = await generateAndSetTokens(res, user);
-  // console.log('Token refresh completed successfully');
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, { user: userResponse }, "Access token refreshed")
-    );
 });
 
 // Send Password Reset OTP

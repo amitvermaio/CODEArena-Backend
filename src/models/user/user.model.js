@@ -155,10 +155,6 @@ const UserSchema = new Schema(
       default: false,
       select: false,
     },
-    refreshToken: {
-      type: String,
-      select: false,
-    },
   },
   { timestamps: true }
 );
@@ -179,31 +175,11 @@ UserSchema.methods.isPasswordCorrect = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Method to generate access token
-UserSchema.methods.generateAccessToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-      username: this.username,
-    },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
-  );
-};
-
-// Method to generate refresh token
-UserSchema.methods.generateRefreshToken = function () {
-  return jwt.sign(
-    {
-      _id: this._id,
-    },
-    process.env.REFRESH_TOKEN_SECRET,
-    {
-      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    }
-  );
-};
+UserSchema.methods.generateToken = async function () {
+  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: "24h",
+  });
+  return token;
+}
 
 export const User = mongoose.model("User", UserSchema);

@@ -21,7 +21,9 @@ export const registerUserService = async (userData) => {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  return user;
+  const token = await user.generateToken();
+
+  return { user, token };
 };
 
 export const loginUserService = async ({ email, username, password }) => {
@@ -46,14 +48,7 @@ export const loginUserService = async ({ email, username, password }) => {
     throw new ApiError(401, "Invalid user credentials");
   }
 
-  const accessToken = user.generateAccessToken();
-  const refreshToken = user.generateRefreshToken();
-  user.refreshToken = refreshToken;
-  await user.save({ validateBeforeSave: false });
+  const token = await user.generateToken();
 
-  const userResponse = user.toObject();
-  delete userResponse.password;
-  delete userResponse.refreshToken;
-
-  return { user: userResponse, accessToken, refreshToken };
+  return { user, token };
 };

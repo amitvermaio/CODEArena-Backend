@@ -1,33 +1,30 @@
 import { body } from "express-validator";
 
 export const registerValidation = [
+  body("fullname")
+    .notEmpty()
+    .withMessage("Fullname is required")
+    .isLength({ min: 3, max: 20 })
+    .withMessage("Fullname must be between 3 and 20 characters"),
   body("email")
     .trim()
     .isEmail()
     .withMessage("Please include a valid email")
     .normalizeEmail(),
-  body("username", "Username is required and must be alphanumeric")
-    .isAlphanumeric()
+  body("username")
     .trim()
-    .escape(),
-  body(
-    "password",
-    "Please enter a password with 6 or more characters"
-  ).isLength({ min: 6 }),
+    .notEmpty()
+    .withMessage("Username is required")
+    .isLength({ min: 3, max: 20 })
+    .withMessage("Username must be between 3 and 20 characters"),
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Please enter a password with 6 or more characters"),
 ];
 
 export const loginValidation = [
-  body().custom((value, { req }) => {
-    const { email, username } = req.body;
-    // console.log(email);
-    if (
-      (!email || email.trim() === "") &&
-      (!username || username.trim() === "")
-    ) {
-      throw new Error("Either email or username is required");
-    }
-    return true;
-  }),
 
   body("email")
     .optional({ checkFalsy: true })
@@ -35,5 +32,7 @@ export const loginValidation = [
     .withMessage("Please include a valid email")
     .normalizeEmail(),
 
-  body("password", "Password is required").notEmpty(),
+  body("password")
+    .notEmpty()
+    .withMessage("Password is required"),
 ];

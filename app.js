@@ -1,6 +1,6 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import "dotenv/config";
 import cookieParser from "cookie-parser";
 import { join } from "path";
 
@@ -30,6 +30,8 @@ app.use(
   })
 );
 
+// app.use(cors());
+
 // Body Parsing Middleware
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -38,18 +40,18 @@ app.use(cookieParser());
 
 // --- Content Security Policy (CSP) Middleware ---
 // This sets a security policy to prevent common attacks.
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "default-src 'self';" + // Only allow resources from our own domain by default
-      "script-src 'self';" + // Allow scripts from our domain
-      "style-src 'self';" + // Allow styles from our domain
-      "img-src 'self' data:;" // Allow images from our domain and data URIs
-    // "script-src 'self' 'unsafe-inline';" + // Remove or comment out unsafe-inline for better security
-    // "style-src 'self' 'unsafe-inline';" +  // Remove or comment out unsafe-inline for better security
-  );
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader(
+//     "Content-Security-Policy",
+//     "default-src 'self';" + // Only allow resources from our own domain by default
+//       "script-src 'self';" + // Allow scripts from our domain
+//       "style-src 'self';" + // Allow styles from our domain
+//       "img-src 'self' data:;" // Allow images from our domain and data URIs
+//     // "script-src 'self' 'unsafe-inline';" + // Remove or comment out unsafe-inline for better security
+//     // "style-src 'self' 'unsafe-inline';" +  // Remove or comment out unsafe-inline for better security
+//   );
+//   next();
+// });
 
 // API Routes
 app.use("/api/v1", mainApiRouter);
