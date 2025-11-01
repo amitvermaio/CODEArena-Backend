@@ -5,8 +5,13 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import blacklistTokenModel from "../models/user/blacklistToken.model.js";
 
 export const protect = asyncHandler(async (req, _, next) => {
+  console.log(req.cookies?.['CodeArena_Token']);
+  console.log("===============================================")
+  console.log("===============================================\n")
+  
+  console.log(req.headers.authorization);
   const token =
-    req.cookies?.[process.env.TOKEN_NAME] ||
+    req.cookies?.['CodeArena_Token'] ||
     req.headers.authorization?.split(" ")[1];
     
 

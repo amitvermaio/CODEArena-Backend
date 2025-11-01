@@ -13,7 +13,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   delete userData.password;
   delete user.status
 
-  res.cookie(process.env.TOKEN_NAME, token, {
+  res.cookie("CodeArena_Token", token, {
     httpOnly: true,
     secure: true,
   });
@@ -37,7 +37,7 @@ export const loginUser = asyncHandler(async (req, res) => {
       password,
     });
 
-    res.cookie(process.env.TOKEN_NAME, token, {
+    res.cookie("CodeArena_Token", token, {
       httpOnly: true,
       secure: true,
     });
@@ -58,10 +58,21 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  
-  const token = res.cookies[process.env.TOKEN_NAME] || req.headers.authorization.split(" ")[1];
-  res.clearCookie(process.env.TOKEN_NAME);
+  const cookieToken = req.cookies?.CodeArena_Token;
+  const headerToken = req.headers.authorization?.split(" ")[1];
+  const token = cookieToken || headerToken;
+
+  if (!token) {
+    throw new ApiError(400, "No active session found");
+  }
+
+  res.clearCookie("CodeArena_Token", {
+    httpOnly: true,
+    secure: true,
+  });
+
   await BlacklistToken.create({ token });
+
   return res
     .status(200)
     .json(new ApiResponse(200, {}, "User logged out successfully"));
