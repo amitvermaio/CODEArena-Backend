@@ -10,6 +10,7 @@ import {
   loginUser,
   getMe,
   logoutUser,
+  deleteAccount,
 } from "../controllers/auth.controller.js";
 
 const router = express.Router();
@@ -30,6 +31,8 @@ router.post("/login", loginValidation, handleValidationErrors, loginUser);
 router.post("/logout", protect, logoutUser);
 
 router.get("/me", protect, getMe);
+
+router.post('/delete-account', protect, deleteAccount);
 
 // @route   POST api/v1/auth/verify-otp
 // router.post('/verify-otp', sendVerifyOtp);

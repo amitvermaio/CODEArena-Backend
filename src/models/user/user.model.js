@@ -150,11 +150,36 @@ const UserSchema = new Schema(
       default: "active",
       select: false,
     },
+    contestParticipated: [{ type: mongoose.Schema.Types.ObjectId, ref: "Contest" }],
+    rank: {
+      type: Number,
+      default: 0,
+    },
+    streak: {
+      type: Number,
+      default: 0,
+    },
     isDeleted: {
       type: Boolean,
       default: false,
       select: false,
     },
+    verifyOtp: {
+      type: String,
+      default: "",
+    },
+    verifyOtpExpiry: {
+      type: Date,
+      default: Date.now() + 900000,
+    },
+    passwordResetOtp: {
+      type: String,
+      default: "",
+    },
+    passwordResetOtpExpiry: {
+      type: Date,
+      default: Date.now() + 900000,
+    }
   },
   { timestamps: true }
 );

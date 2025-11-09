@@ -7,6 +7,5 @@ export const problemMiddleware = (req, res, next) => {
       message: "Unauthorized"
     });
   }
-
   next();
 };

@@ -116,12 +116,13 @@ export const updateUserAvatar = asyncHandler(async (req, res) => {
 
 export const getUserProfile = asyncHandler(async (req, res) => {
   const { username } = req.params;
+  console.log(username);
   if (!username?.trim()) {
     throw new ApiError(400, "Username is missing");
   }
 
   const user = await User.findOne({ username }).select(
-    "-password -refreshToken"
+    "-password"
   );
 
   if (!user) {

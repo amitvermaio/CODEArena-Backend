@@ -33,22 +33,24 @@ export const loginUserService = async ({ email, username, password }) => {
 
   const user = await User.findOne({
     $or: [{ email }, { username }],
-  }).select("+password");
+  }).select("+password +isDeleted");
 
   if (!user) {
     throw new ApiError(404, "User not found");
   }
 
-  if (user.isDeleted) {
+  if (user.isDeleted === true) {
     throw new ApiError(403, "User account is deactivated. Contact Support.");
   }
-
   const isPasswordValid = await user.isPasswordCorrect(password);
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid user credentials");
   }
 
   const token = await user.generateToken();
+  const userData = user.toObject();
+  delete userData.password;
+  delete userData.isDeleted;
 
-  return { user, token };
+  return { user: userData, token };
 };

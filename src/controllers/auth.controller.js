@@ -13,7 +13,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   delete userData.password;
   delete user.status
 
-  res.cookie("CodeArena_Token", token, {
+  res.cookie("CA_AUTH_TOKEN", token, {
     httpOnly: true,
     secure: true,
   });
@@ -24,30 +24,26 @@ export const registerUser = asyncHandler(async (req, res) => {
 });
 
 export const loginUser = asyncHandler(async (req, res) => {
-  try {
-    const { email, username, password } = req.body;
+  const { email, username, password } = req.body;
 
-    if (!email && !username) {
-      throw new ApiError(400, "Email or username required!");
-    }
-
-    const { user, token } = await loginUserService({
-      email,
-      username,
-      password,
-    });
-
-    res.cookie("CodeArena_Token", token, {
-      httpOnly: true,
-      secure: true,
-    });
-
-    return res
-      .status(200)
-      .json(new ApiResponse(200, { user, token }, "User logged in successfully"));
-  } catch (error) {
-    throw new ApiError(404, "User not found", error.message);
+  if (!email && !username) {
+    throw new ApiError(400, "Email or username required!");
   }
+
+  const { user, token } = await loginUserService({
+    email,
+    username,
+    password,
+  });
+
+  res.cookie("CA_AUTH_TOKEN", token, {
+    httpOnly: true,
+    secure: true,
+  });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { user, token }, "User logged in successfully"));
 });
 
 export const getMe = asyncHandler(async (req, res) => {
@@ -58,7 +54,7 @@ export const getMe = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-  const cookieToken = req.cookies?.CodeArena_Token;
+  const cookieToken = req.cookies?.CA_AUTH_TOKEN;
   const headerToken = req.headers.authorization?.split(" ")[1];
   const token = cookieToken || headerToken;
 
@@ -66,7 +62,7 @@ export const logoutUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "No active session found");
   }
 
-  res.clearCookie("CodeArena_Token", {
+  res.clearCookie("CA_AUTH_TOKEN", {
     httpOnly: true,
     secure: true,
   });
@@ -114,3 +110,16 @@ export const passwordResetOtp = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+export const deleteAccount = asyncHandler(async (req, res) => {
+  const user = req.user;
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  user.isDeleted = true;
+  await user.save();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User deleted successfully"));
+});

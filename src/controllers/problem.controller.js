@@ -22,7 +22,8 @@ export const getAllProblems = asyncHandler(async (req, res) => {
 });
 
 export const getProblemBySlug = asyncHandler(async (req, res) => {
-  const slug = req.params;
+  const { slug } = req.params;
+  
   const problem = await Problem.findOne({ slug });
   if (!problem) {
     throw new ApiError(404, "Problem not found");
