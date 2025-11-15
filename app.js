@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { join } from "path";
+import passport from "./src/config/passport.js";
 
 import connectDB from "./src/config/db.js";
 // import { initializePassport } from './src/config/passport.config.js';
@@ -30,13 +31,12 @@ app.use(
   })
 );
 
-// app.use(cors());
-
 // Body Parsing Middleware
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static(join(__dirname, "public")));
 app.use(cookieParser());
+app.use(passport.initialize());
 
 // --- Content Security Policy (CSP) Middleware ---
 // This sets a security policy to prevent common attacks.

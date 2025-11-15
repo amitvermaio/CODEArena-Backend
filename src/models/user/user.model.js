@@ -197,10 +197,15 @@ UserSchema.pre("save", async function (next) {
 
 // Method to compare passwords for local login
 UserSchema.methods.isPasswordCorrect = async function (enteredPassword) {
+  if (!this.password) {
+    return false;
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
 UserSchema.methods.generateToken = async function () {
+  
+
   const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });

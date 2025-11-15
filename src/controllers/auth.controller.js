@@ -6,6 +6,8 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import BlacklistToken from "../models/user/blacklistToken.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import { User } from "../models/user/user.model.js";
+import jwt from "jsonwebtoken";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { user, token } = await registerUserService(req.body);
@@ -122,4 +124,46 @@ export const deleteAccount = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, user, "User deleted successfully"));
+});
+
+export const googleAuthSuccess = asyncHandler(async (req, res) => {
+  try {
+    const googleEmail = req.user.emails[0].value;
+    const googleId = req.user.id;
+    const fullname = req.user.displayName;
+    const avatar = req.user.photos[0]?.value || "";
+
+    let user = await User.findOne({ email: googleEmail });
+
+    if (!user) {
+      // Generate username automatically
+      const generatedUsername = googleEmail.split("@")[0] + "_" + Date.now().toString().slice(-4);
+
+      user = await User.create({
+        username: generatedUsername,
+        email: googleEmail,
+        fullname,
+        avatar,
+        googleId,
+        password: null, // because OAuth user
+        isEmailVerified: true,
+      });
+    }
+
+    // Generate token
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "10d",
+    });
+
+    res.cookie("CA_AUTH_TOKEN", token, {
+      httpOnly: true,
+      secure: true,
+    });
+    
+    const frontendBaseUrl = process.env.FRONTEND_BASE_URL;
+
+    return res.redirect(`${frontendBaseUrl}/problems`);
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
 });

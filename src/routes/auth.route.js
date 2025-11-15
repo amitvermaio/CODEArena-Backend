@@ -11,7 +11,10 @@ import {
   getMe,
   logoutUser,
   deleteAccount,
+  googleAuthSuccess,
 } from "../controllers/auth.controller.js";
+
+import passport from "passport";
 
 const router = express.Router();
 
@@ -40,5 +43,13 @@ router.post('/delete-account', protect, deleteAccount);
 // @route   POST api/v1/auth/verify-account
 // router.post('/verify-account', verifyAccount);
 
+
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { session: false }),
+  googleAuthSuccess
+);
 
 export default router;
