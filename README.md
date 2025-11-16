@@ -1,8 +1,8 @@
-<div align="center">
+<div>
 
 # **CODEARENA-BACKEND**
 
-<div id="top"/>
+<div id="top" align="center">
 
 ### ⚡ Powering Seamless, Scalable Backend Innovation
 
