@@ -30,6 +30,7 @@ import {
   updateContest,
   deleteContest,
 } from "../controllers/contest.controller.js";
+import { setPOTD } from "../controllers/problemOfDay.controller.js";
 
 const router = express.Router();
 
@@ -45,6 +46,9 @@ router.patch("/users/:userId/delete", protect, admin, deleteUser);
 router.patch("/users/:userId/restore", protect, admin /* restoreUser */);
 
 /* ---------- PROBLEM MANAGEMENT ---------- */
+
+router.post("/set-potd", protect, admin, setPOTD);
+
 // get all problems route
 router.get("/problems", protect, admin, getAllProblems);
 

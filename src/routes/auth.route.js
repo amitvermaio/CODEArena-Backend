@@ -12,6 +12,7 @@ import {
   logoutUser,
   deleteAccount,
   googleAuthSuccess,
+  githubAuthSuccess,
 } from "../controllers/auth.controller.js";
 
 import passport from "passport";
@@ -48,8 +49,16 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { session: false }),
+  passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_BASE_URL}/signin` }),
   googleAuthSuccess
+);
+
+router.get('/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+router.get(
+  '/github/callback',
+  passport.authenticate('github', { session: false, failureRedirect: `${process.env.FRONTEND_BASE_URL}/signin` }),
+  githubAuthSuccess
 );
 
 export default router;

@@ -170,7 +170,7 @@ const UserSchema = new Schema(
     },
     verifyOtpExpiry: {
       type: Date,
-      default: Date.now() + 900000,
+      default: undefined,
     },
     passwordResetOtp: {
       type: String,
@@ -178,7 +178,7 @@ const UserSchema = new Schema(
     },
     passwordResetOtpExpiry: {
       type: Date,
-      default: Date.now() + 900000,
+      default: undefined,
     }
   },
   { timestamps: true }

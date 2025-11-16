@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
   registerUserService,
   loginUserService,
@@ -7,7 +8,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import BlacklistToken from "../models/user/blacklistToken.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user/user.model.js";
-import jwt from "jsonwebtoken";
+import { generateToken } from "../utils/jwt.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { user, token } = await registerUserService(req.body);
@@ -151,9 +152,7 @@ export const googleAuthSuccess = asyncHandler(async (req, res) => {
     }
 
     // Generate token
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "10d",
-    });
+    const token = generateToken(user._id);
 
     res.cookie("CA_AUTH_TOKEN", token, {
       httpOnly: true,
@@ -162,7 +161,63 @@ export const googleAuthSuccess = asyncHandler(async (req, res) => {
     
     const frontendBaseUrl = process.env.FRONTEND_BASE_URL;
 
-    return res.redirect(`${frontendBaseUrl}/problems`);
+    return res.redirect(`${frontendBaseUrl}/oauth-success?token=${token}`);
+  } catch (error) {
+    throw new ApiError(500, error.message);
+  }
+});
+
+export const githubAuthSuccess = asyncHandler(async (req, res) => {
+  try {
+    let githubEmail = req.user.emails?.[0]?.value || req.user._json?.email;
+
+    if (!githubEmail && req.user.accessToken) {
+      const emailResponse = await axios.get("https://api.github.com/user/emails", {
+        headers: {
+          Authorization: `token ${req.user.accessToken}`,
+          Accept: "application/vnd.github+json",
+        },
+      });
+
+      const primaryEmail = emailResponse.data?.find((emailObj) => emailObj.primary && emailObj.verified);
+      githubEmail = primaryEmail?.email || emailResponse.data?.[0]?.email;
+    }
+
+    if (!githubEmail) {
+      throw new ApiError(400, "GitHub email not available. Please make your email public or use another sign-in method.");
+    }
+    const githubId = req.user.id;
+    const fullname = req.user.displayName;
+    const avatar = req.user.photos[0]?.value || "";
+
+    let user = await User.findOne({ email: githubEmail });
+
+    if (!user) {
+      // Generate username automatically
+      const generatedUsername = githubEmail.split("@")[0] + "_" + Date.now().toString().slice(-4);
+
+      user = await User.create({
+        username: generatedUsername,
+        email: githubEmail,
+        fullname,
+        avatar,
+        githubId,
+        password: null, // because OAuth user
+        isEmailVerified: true,
+      });
+    }
+
+    // Generate token
+    const token = generateToken(user._id);
+
+    res.cookie("CA_AUTH_TOKEN", token, {
+      httpOnly: true,
+      secure: true,
+    });
+    
+    const frontendBaseUrl = process.env.FRONTEND_BASE_URL;
+
+    return res.redirect(`${frontendBaseUrl}/oauth-success?token=${token}`);
   } catch (error) {
     throw new ApiError(500, error.message);
   }

@@ -1,10 +1,11 @@
 import express from "express";
 import authRouter from "./auth.route.js";
-import { protect } from "../middlewares/auth.middleware.js";
 import userRouter from "./user.route.js";
 import problemRouter from "./problem.route.js";
 import contestRouter from "./contest.route.js";
 import adminRouter from "./admin.route.js";
+
+import { protect } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 

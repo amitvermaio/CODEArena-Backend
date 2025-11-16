@@ -1,10 +1,6 @@
 import express from "express";
 import { protect } from "../middlewares/auth.middleware.js";
 import { problemMiddleware } from "../middlewares/problem.middleware.js";
-import {
-  createProblemValidation,
-  handleProblemsValidationErrors,
-} from "../validations/problem.validation.js";
 
 import {
   getAllProblems,
@@ -12,8 +8,11 @@ import {
   submitSolution,
   getMySubmissionsForProblem,
 } from "../controllers/problem.controller.js";
+import { getPOTD } from "../controllers/problemOfDay.controller.js";
 
 const router = express.Router();
+
+router.get('/potd', problemMiddleware, getPOTD);
 
 // --- User Routes ---
 // GET api/v1/problems -> Get all problems (with filters)
