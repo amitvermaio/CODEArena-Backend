@@ -25,12 +25,12 @@ import {
   deleteProblem,
 } from "../controllers/problem.controller.js";
 import {
-  getAdminAllContests,
+  allContests,
   createContest,
   updateContest,
   deleteContest,
 } from "../controllers/contest.controller.js";
-import { setPOTD } from "../controllers/problemOfDay.controller.js";
+import { setPOTD, updatePOTD } from "../controllers/problemOfDay.controller.js";
 
 const router = express.Router();
 
@@ -48,6 +48,8 @@ router.patch("/users/:userId/restore", protect, admin /* restoreUser */);
 /* ---------- PROBLEM MANAGEMENT ---------- */
 
 router.post("/set-potd", protect, admin, setPOTD);
+
+router.put("/update-potd", protect, admin, updatePOTD);
 
 // get all problems route
 router.get("/problems", protect, admin, getAllProblems);
@@ -76,7 +78,7 @@ router.patch(
 router.delete("/problems/:problemId", protect, admin, deleteProblem);
 
 /* ---------- CONTEST MANAGEMENT ---------- */
-router.get("/contests", protect, admin, getAdminAllContests);
+router.get("/contests", allContests);
 
 router.post(
   "/contests",

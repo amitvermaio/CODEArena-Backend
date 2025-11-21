@@ -106,104 +106,132 @@ export const submitContestSolution = asyncHandler(async (req, res) => {
 });
 
 // Admin: Create a new contest
-export const getAdminAllContests = asyncHandler(async (req, res) => {
+export const allContests = asyncHandler(async (req, res) => {
   const contests = await Contest.find({});
   return res
     .status(200)
     .json(new ApiResponse(200, contests, "Contests fetched successfully"));
 });
 
+const convertDurationToMinutes = (duration) => {
+  if (!duration) return null;
+  if (duration.endsWith("h")) {
+    return parseInt(duration) * 60; // "2h" → 120
+  }
+  if (duration.endsWith("m")) {
+    return parseInt(duration); // "90m" → 90
+  }
+  return null;
+};
+
+
 export const createContest = asyncHandler(async (req, res) => {
+  console.log(req.body)
   const {
     title,
     description,
     startTime,
-    endTime,
-    registrationDeadline,
-    visibility,
-    maxParticipants,
-    problems,
+    duration, // ⛔ string e.g. '1h', '2h'
   } = req.body;
 
-  if (!req.file) {
-    throw new ApiError(400, "Cover image is required");
+  // Convert problems (JSON string → Array of IDs)
+  let problems = [];
+  if (req.body.problems) {
+    try {
+      problems = JSON.parse(req.body.problems);
+    } catch (err) {
+      throw new ApiError(400, "Invalid problems format");
+    }
   }
 
-  const existedContest = await Contest.findOne({ title });
-  if (existedContest) {
-    return res
-      .status(404)
-      .send(
-        new ApiResponse(404, "Contest With This Title already existed", false)
-      );
+  // Convert duration (string → minutes)
+  const length = convertDurationToMinutes(duration);
+  if (!length) throw new ApiError(400, "Invalid duration format");
+
+  if (!req.file) throw new ApiError(400, "Cover image is required");
+
+  // Contest must be unique by title
+  const existed = await Contest.findOne({ title });
+  if (existed) {
+    throw new ApiError(400, "Contest with this title already exists");
   }
 
   try {
-    const coverImage = await uploadFile(req.file, "Contests");
-    console.log("Coverimage: \n", coverImage);
+    // Upload image (Cloudinary)
+    const uploaded = await uploadFile(req.file, "Contests");
 
     const contest = await Contest.create({
-      coverImage: coverImage.url,
-      coverImageId: coverImage.fileId,
+      coverImage: uploaded.url,
+      coverImageId: uploaded.fileId,
       title,
       description,
       startTime,
-      endTime,
-      registrationDeadline,
-      visibility,
-      maxParticipants,
+      length,
       problems,
       createdBy: req.user._id,
     });
 
-    return res
-      .status(201)
-      .json(new ApiResponse(201, contest, "Contest created successfully"));
-  } catch (error) {
-    throw new ApiError(500, error.message);
+    return res.status(201).json(
+      new ApiResponse(201, contest, "Contest created successfully")
+    );
+// { id: '1', slug: 'weekly-sprint-24', title: 'Weekly Sprint #24', type: 'platform', startTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), duration: '2 hours', registered: true, imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=2070&auto=format&fit=crop' },
+  } catch (err) {
+    throw new ApiError(500, err.message);
   }
 });
 
 export const updateContest = asyncHandler(async (req, res) => {
   const { contestId } = req.params;
-  const contest = await Contest.findById(contestId);
 
-  if (!contest) {
-    throw new ApiError(404, "Contest not found");
+  const contest = await Contest.findById(contestId);
+  if (!contest) throw new ApiError(404, "Contest not found");
+
+  // Handle problems update
+  if (req.body.problems) {
+    try {
+      req.body.problems = JSON.parse(req.body.problems);
+    } catch (err) {
+      throw new ApiError(400, "Invalid problems format");
+    }
+  }
+
+  // Handle duration update → convert to minutes
+  if (req.body.duration) {
+    req.body.length = convertDurationToMinutes(req.body.duration);
+    delete req.body.duration;
   }
 
   try {
+    // Update cover image if provided
     if (req.file) {
       await deleteFile(contest.coverImageId);
+
+      const uploaded = await uploadFile(req.file, "Contests");
+      req.body.coverImage = uploaded.url;
+      req.body.coverImageId = uploaded.fileId;
     }
-
-    const uploadResponse = await uploadFile(req.file, "Contests");
-
-    req.body.coverImageId = uploadResponse.fileId;
-    req.body.coverImage = uploadResponse.url;
 
     const updatedContest = await Contest.findByIdAndUpdate(
       contestId,
       req.body,
       { new: true }
     );
-    return res
-      .status(200)
-      .send(
-        new ApiResponse(200, updatedContest, "Contest Updated Successfully")
-      );
+
+    return res.status(200).json(
+      new ApiResponse(200, updatedContest, "Contest updated successfully")
+    );
+
   } catch (error) {
-    return res
-      .status(500)
-      .send(
-        new ApiError(
-          500,
-          error.message,
-          "Error While updating Contest details!"
-        )
-      );
+    return res.status(500).json(
+      new ApiError(
+        500,
+        error.message,
+        "Error while updating contest details"
+      )
+    );
   }
 });
+
 
 export const deleteContest = asyncHandler(async (req, res) => {
   const { contestId } = req.params;

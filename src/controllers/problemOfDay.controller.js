@@ -55,3 +55,32 @@ export const getPOTD = asyncHandler(async (req, res) => {
     );
 });
 
+export const updatePOTD = asyncHandler(async (req, res) => {
+    const { problemId } = req.body ?? {};
+
+    if (!problemId) {
+      throw new ApiError(400, "problemId is required in the request body");
+    }
+
+    const problem = await Problem.findById(problemId);
+
+    if (!problem) {
+      throw new ApiError(404, "Problem not found");
+    }
+
+    const potd = await ProblemOfDay.findOne({
+      date: todayDate(),
+    });
+
+    if (!potd) {
+      throw new ApiError(404, "Problem of the day not found");
+    }
+
+    potd.problemId = problemId;
+    potd.updatedBy = req.user.fullname;
+    await potd.save();
+
+    res.status(200).json(
+      new ApiResponse(200, potd, "Problem of the day updated successfully")
+    );
+});

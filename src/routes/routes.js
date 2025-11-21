@@ -13,7 +13,7 @@ router.use("/auth", authRouter);
 router.use("/users", userRouter);
 router.use("/admin", adminRouter);
 router.use("/problems", problemRouter);
-router.use("/contests", protect, contestRouter);
+router.use("/contests", contestRouter);
 // router.use('/collaboration', collaborationRouter);
 
 export default router;

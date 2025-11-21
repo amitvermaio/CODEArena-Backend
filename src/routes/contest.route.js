@@ -22,7 +22,7 @@ router.get("/", getAllContests);
 // @route   GET api/v1/contests/:contestId
 // @desc    Get details of a single contest
 // @access  Public
-router.get("/:contestId", getContestDetails);
+router.get("/:contestId", protect, getContestDetails);
 
 // @route   POST api/v1/contests/:contestId/register
 // @desc    Register the logged-in user for a contest
@@ -32,7 +32,7 @@ router.post("/:contestId/register", protect, registerForContest);
 // @route   GET api/v1/contests/:contestId/leaderboard
 // @desc    Get the leaderboard for a contest
 // @access  Public
-router.get("/:contestId/leaderboard", getContestLeaderboard);
+router.get("/:contestId/leaderboard", protect, getContestLeaderboard);
 
 // @route   POST api/v1/contests/:contestId/submit/:problemId
 // @desc    Submit a solution for a problem within a contest
