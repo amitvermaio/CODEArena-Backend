@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
-import Problem from "./problem.model.js"; // adjust path as per your project
+import { Problem } from "./problem.model.js"; // adjust path as per your project
 import slugify from "slugify";
 
 // MongoDB connection
-const MONGO_URI = "mongodb://127.0.0.1:27017/codearena"; // change if needed
+
 
 const problems = [
   {

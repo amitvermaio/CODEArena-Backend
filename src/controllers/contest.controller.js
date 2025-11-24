@@ -7,12 +7,10 @@ import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadFile, deleteFile } from "../utils/ImageKit.js";
 
-// Get all contests (upcoming, ongoing, past)
+
 export const getAllContests = asyncHandler(async (req, res) => {
   const now = new Date();
-  const contests = await Contest.find()
-    .populate("problems", "title difficulty")
-    .populate("createdBy", "username");
+  const contests = await Contest.find();
   const upcoming = contests.filter((c) => c.startTime > now);
   const ongoing = contests.filter((c) => c.startTime <= now && c.endTime > now);
   const past = contests.filter((c) => c.endTime <= now);
