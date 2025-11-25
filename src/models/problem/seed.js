@@ -4,7 +4,6 @@ import slugify from "slugify";
 
 // MongoDB connection
 
-
 const problems = [
   {
     title: "Word Break II",
@@ -483,27 +482,32 @@ const problems = [
   },
 ];
 
+function prepareProblems() {
+  return problems.map((p) => ({
+    ...p,
+    slug: slugify(p.title, { lower: true, strict: true }),  // <-- IMPORTANT
+    timeLimit: p.timeLimit || 1000,
+    memoryLimit: p.memoryLimit || 256,
+    editorial: p.editorial || "",
+    author: p.author || null,
+  }));
+}
+
 const seedDB = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
+
     await Problem.deleteMany({});
 
-    const problemsWithSlugs = problems.map((problem) => ({
-      ...problem,
-      slug: slugify(problem.title, { lower: true, strict: true }),
-    }));
+    const finalData = prepareProblems(); // <-- pre-save slug generation
 
-    await Problem.insertMany(problemsWithSlugs);
-    console.log("✅ Database seeded with problems!");
+    await Problem.insertMany(finalData); // <-- slug now saved in DB
+
+    console.log("✅ Seeded with slugs!");
     process.exit();
-  } catch (error) {
-    console.error("❌ Error seeding database:", error);
+  } catch (err) {
+    console.error(err);
     process.exit(1);
   }
 };
-// seedDB();
 
-/**
- * 
-
- */
+seedDB();
