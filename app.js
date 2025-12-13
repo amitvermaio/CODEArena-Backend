@@ -31,7 +31,7 @@ app.use(
   })
 );
 
-app.use(rateLimit());
+app.use(rateLimit);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(join(__dirname, "public")));
