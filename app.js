@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { join } from "path";
 import passport from "./src/config/passport.js";
-import rateLimit from "express-rate-limit";
+import rateLimit from "./src/middlewares/rateLimiter.middleware.js";
 import connectDB from "./src/config/db.js";
 // import { initializePassport } from './src/config/passport.config.js';
 
